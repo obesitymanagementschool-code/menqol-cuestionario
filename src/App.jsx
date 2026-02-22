@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { DOMAINS } from './data.js'
 import { supabase } from './supabase.js'
+import Dashboard from './Dashboard.jsx'
 import './styles.css'
 
 /* ─── Helpers ─── */
@@ -717,6 +718,11 @@ export default function App() {
               background: "white", color: "#94A3B8", border: "1.5px solid #E2E8F0",
               fontSize: 13, fontWeight: 600, cursor: "pointer"
             }}>🎲 Rellenar aleatorio (demo)</button>
+            <button onClick={() => setStep("dashboard")} style={{
+              width: "100%", padding: 14, borderRadius: 14, marginTop: 10,
+              background: "white", color: "#94A3B8", border: "1.5px solid #E2E8F0",
+              fontSize: 13, fontWeight: 600, cursor: "pointer"
+            }}>📊 Dashboard investigación</button>
           </div>
         )}
 
@@ -821,6 +827,11 @@ export default function App() {
           <ResultsView answers={answers} age={age} weight={weight} onReset={reset} />
         )}
       </div>
+
+      {/* ── DASHBOARD (full-width, outside container) ── */}
+      {step === "dashboard" && (
+        <Dashboard onBack={() => setStep("intro")} />
+      )}
 
       {/* Tooltip bottom sheet (portal-like) */}
       {tooltipItem && <InfoSheet item={tooltipItem} onClose={() => setOpenTooltip(null)} />}
