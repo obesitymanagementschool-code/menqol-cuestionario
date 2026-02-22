@@ -405,6 +405,19 @@ export default function App() {
     setCurrentDomain(0); scrollTop()
   }
 
+  const fillRandom = () => {
+    const rand = {}
+    DOMAINS.forEach(d => d.items.forEach(item => {
+      const present = Math.random() > 0.35
+      rand[item.id] = present
+        ? { present: true, rating: Math.floor(Math.random() * 10) + 1 }
+        : { present: false, rating: null }
+    }))
+    setAnswers(rand)
+    setStep("results")
+    scrollTop()
+  }
+
   // Find the item for the open tooltip
   const tooltipItem = openTooltip
     ? DOMAINS.flatMap(d => d.items).find(i => i.id === openTooltip)
@@ -494,6 +507,11 @@ export default function App() {
               fontSize: 16, fontWeight: 700, cursor: "pointer",
               boxShadow: "0 4px 15px rgba(30,41,59,0.3)"
             }}>Comenzar</button>
+            <button onClick={fillRandom} style={{
+              width: "100%", padding: 14, borderRadius: 14, marginTop: 10,
+              background: "white", color: "#94A3B8", border: "1.5px solid #E2E8F0",
+              fontSize: 13, fontWeight: 600, cursor: "pointer"
+            }}>🎲 Rellenar aleatorio (demo)</button>
           </div>
         )}
 
