@@ -30,8 +30,8 @@ const getAgeGroup = (age) => {
 // MENQOL 1-8 → 0-100%
 const menqolToPct = (v) => (v - 1) / 7 * 100
 
-// MCID = 0.9 points on 1-8 scale → ~12.86% on 0-100%
-const MCID_PCT = 0.9 / 7 * 100
+// MCID (Minimum Clinically Important Difference) = 0.9 on MENQOL 1-8 scale
+const MCID = 0.9
 
 /* ─── Info Bottom Sheet ─── */
 function InfoSheet({ item, onClose }) {
@@ -59,9 +59,9 @@ function InfoSheet({ item, onClose }) {
         <div style={{ background: "#F8FAFC", borderRadius: 12, padding: 16 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 10 }}>Guía de puntuación:</p>
           {[
-            { range: "1–3", color: "#22C55E", text: item.scale.low },
-            { range: "4–6", color: "#F59E0B", text: item.scale.mid },
-            { range: "7–10", color: "#EF4444", text: item.scale.high },
+            { range: "2–4", color: "#22C55E", text: item.scale.low },
+            { range: "5–6", color: "#F59E0B", text: item.scale.mid },
+            { range: "7–8", color: "#EF4444", text: item.scale.high },
           ].map(s => (
             <div key={s.range} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 6 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: s.color, minWidth: 32 }}>{s.range}</span>
@@ -79,20 +79,20 @@ function InfoSheet({ item, onClose }) {
   )
 }
 
-/* ─── Scale Selector (1-10) ─── */
+/* ─── Scale Selector (MENQOL 2-8) ─── */
 function ScaleSelector({ value, onChange, color }) {
   return (
     <div style={{ marginTop: 10 }} className="fade-in">
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", gap: 4 }}>
-        {[1,2,3,4,5,6,7,8,9,10].map(n => {
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5 }}>
+        {[2,3,4,5,6,7,8].map(n => {
           const sel = value === n
           return (
             <button key={n} onClick={() => onChange(n)} style={{
-              width: "100%", aspectRatio: "1", borderRadius: 8,
+              width: "100%", aspectRatio: "1", borderRadius: 10,
               border: sel ? "none" : "1.5px solid #E2E8F0",
               background: sel ? color : "#F8FAFC",
               color: sel ? "white" : "#64748B",
-              fontSize: 14, fontWeight: sel ? 700 : 500,
+              fontSize: 15, fontWeight: sel ? 700 : 500,
               cursor: "pointer", transition: "all 0.15s",
               display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: sel ? `0 2px 8px ${color}40` : "none"
@@ -104,8 +104,8 @@ function ScaleSelector({ value, onChange, color }) {
         display: "flex", justifyContent: "space-between",
         fontSize: 11, color: "#94A3B8", marginTop: 4
       }}>
-        <span>Poco molesto</span>
-        <span>Muy molesto</span>
+        <span>No me molesta</span>
+        <span>Extremadamente</span>
       </div>
     </div>
   )
@@ -161,7 +161,7 @@ function QuestionItem({ item, domain, answer, onAnswer, openTooltip, setOpenTool
       {isYes && <ScaleSelector value={answer?.rating} onChange={r => onAnswer(item.id, { present: true, rating: r })} color={domain.color} />}
       {needsRating && (
         <p style={{ fontSize: 12, color: domain.color, marginTop: 8, fontWeight: 500 }}>
-          ⬆ Selecciona una puntuación del 1 al 10
+          ⬆ Indica cuánto te molesta (2-8)
         </p>
       )}
     </div>
@@ -268,19 +268,20 @@ function RadarChart({ domainResults, refPcts, ageGroup }) {
 /* ─── Results View ─── */
 function ResultsView({ answers, age, weight, onReset }) {
   const domainResults = DOMAINS.map(domain => {
-    let total = 0, yesCount = 0
+    let scoreSum = 0, yesCount = 0
     domain.items.forEach(item => {
       const a = answers[item.id]
-      if (a?.present && a?.rating) { total += a.rating; yesCount++ }
+      if (a?.present && a?.rating) { scoreSum += a.rating; yesCount++ }
+      else { scoreSum += 1 } // "No" = 1 en escala MENQOL
     })
-    const maxPossible = domain.items.length * 10
-    const pct = maxPossible > 0 ? Math.round(total / maxPossible * 100) : 0
-    return { domain, total, yesCount, pct, count: domain.items.length }
+    const mean = scoreSum / domain.items.length // 1-8
+    const pct = Math.round(menqolToPct(mean))   // 0-100%
+    return { domain, mean, yesCount, pct, count: domain.items.length, scoreSum }
   })
 
-  const overallTotal = domainResults.reduce((s, d) => s + d.total, 0)
-  const overallMax = 29 * 10
-  const overallPct = Math.round(overallTotal / overallMax * 100)
+  const overallSum = domainResults.reduce((s, d) => s + d.scoreSum, 0)
+  const overallMean = overallSum / 29 // 1-8
+  const overallPct = Math.round(menqolToPct(overallMean))
   const overall = getLevel(overallPct)
 
   // Reference data
@@ -304,9 +305,9 @@ function ResultsView({ answers, age, weight, onReset }) {
         background: "linear-gradient(135deg, #1E293B 0%, #334155 100%)",
         borderRadius: 20, padding: 24, marginBottom: 20, color: "white", textAlign: "center"
       }}>
-        <p style={{ fontSize: 13, opacity: 0.7, marginBottom: 4 }}>Puntuación global</p>
+        <p style={{ fontSize: 13, opacity: 0.7, marginBottom: 4 }}>Puntuación global MENQOL</p>
         <p style={{ fontSize: 48, fontWeight: 800, lineHeight: 1.1 }}>
-          {overallTotal}<span style={{ fontSize: 20, opacity: 0.5 }}>/{overallMax}</span>
+          {overallMean.toFixed(1)}<span style={{ fontSize: 20, opacity: 0.5 }}>/8</span>
         </p>
         <div style={{
           display: "inline-block", padding: "6px 16px", borderRadius: 20,
@@ -325,7 +326,7 @@ function ResultsView({ answers, age, weight, onReset }) {
 
       {/* Domain bars */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {domainResults.map(({ domain, total, yesCount, pct, count }) => {
+        {domainResults.map(({ domain, mean, yesCount, pct, count }) => {
           const level = getLevel(pct)
           return (
             <div key={domain.id} style={{
@@ -347,7 +348,7 @@ function ResultsView({ answers, age, weight, onReset }) {
                 fontSize: 12, color: "#94A3B8"
               }}>
                 <span>{yesCount} de {count} síntomas presentes</span>
-                <span>{total} pts</span>
+                <span>{mean.toFixed(1)}/8</span>
               </div>
             </div>
           )
@@ -374,11 +375,11 @@ function ResultsView({ answers, age, weight, onReset }) {
 
         {/* Global row */}
         {(() => {
-          const diff = overallPct - refGlobalPct
+          const diff = overallMean - ref.global
           const absDiff = Math.abs(diff)
-          const significant = absDiff >= MCID_PCT
+          const significant = absDiff >= MCID
           const better = diff < 0
-          const neutral = absDiff < (0.5 / 7 * 100)
+          const neutral = absDiff < 0.5
           const diffColor = neutral ? "#F59E0B" : better ? "#22C55E" : "#EF4444"
           const diffBg = neutral ? "#FFFBEB" : better ? "#F0FDF4" : "#FEF2F2"
           const diffLabel = neutral ? "En la media" : better ? "Por debajo" : "Por encima"
@@ -395,16 +396,16 @@ function ResultsView({ answers, age, weight, onReset }) {
                 }}>{diffLabel}{significant ? " *" : ""}</span>
               </div>
               <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#64748B", marginBottom: 6 }}>
-                <span>T&uacute;: <strong style={{ color: "#1E293B" }}>{overallPct}%</strong></span>
-                <span>Ref: <strong style={{ color: "#94A3B8" }}>{Math.round(refGlobalPct)}%</strong></span>
+                <span>Tú: <strong style={{ color: "#1E293B" }}>{overallMean.toFixed(1)}</strong></span>
+                <span>Ref: <strong style={{ color: "#94A3B8" }}>{ref.global.toFixed(1)}</strong></span>
                 <span style={{ color: diffColor, fontWeight: 600 }}>
-                  {diff > 0 ? "+" : ""}{Math.round(diff)}%
+                  {diff > 0 ? "+" : ""}{diff.toFixed(1)}
                 </span>
               </div>
-              {/* Dual bar */}
+              {/* Dual bar on 1-8 scale */}
               <div style={{ position: "relative", height: 8, background: "#E2E8F0", borderRadius: 4, overflow: "hidden" }}>
                 <div style={{ position: "absolute", height: "100%", width: `${overallPct}%`, background: "#7C9CE8", borderRadius: 4, opacity: 0.7 }} />
-                <div style={{ position: "absolute", height: "100%", width: 2, left: `${Math.min(refGlobalPct, 100)}%`, background: "#475569", borderRadius: 1 }} />
+                <div style={{ position: "absolute", height: "100%", width: 2, left: `${menqolToPct(ref.global)}%`, background: "#475569", borderRadius: 1 }} />
               </div>
             </div>
           )
@@ -412,12 +413,12 @@ function ResultsView({ answers, age, weight, onReset }) {
 
         {/* Per-domain rows */}
         {domainResults.map((d, i) => {
-          const rPct = refPcts[i]
-          const diff = d.pct - rPct
+          const refMean = ref[domainKeys[i]]
+          const diff = d.mean - refMean
           const absDiff = Math.abs(diff)
-          const significant = absDiff >= MCID_PCT
+          const significant = absDiff >= MCID
           const better = diff < 0
-          const neutral = absDiff < (0.5 / 7 * 100)
+          const neutral = absDiff < 0.5
           const diffColor = neutral ? "#F59E0B" : better ? "#22C55E" : "#EF4444"
           const diffBg = neutral ? "#FFFBEB" : better ? "#F0FDF4" : "#FEF2F2"
           const diffLabel = neutral ? "En la media" : better ? "Por debajo" : "Por encima"
@@ -433,16 +434,16 @@ function ResultsView({ answers, age, weight, onReset }) {
                 }}>{diffLabel}{significant ? " *" : ""}</span>
               </div>
               <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#64748B", marginBottom: 5 }}>
-                <span>T&uacute;: <strong style={{ color: d.domain.color }}>{d.pct}%</strong></span>
-                <span>Ref: <strong style={{ color: "#94A3B8" }}>{Math.round(rPct)}%</strong></span>
+                <span>Tú: <strong style={{ color: d.domain.color }}>{d.mean.toFixed(1)}</strong></span>
+                <span>Ref: <strong style={{ color: "#94A3B8" }}>{refMean.toFixed(1)}</strong></span>
                 <span style={{ color: diffColor, fontWeight: 600 }}>
-                  {diff > 0 ? "+" : ""}{Math.round(diff)}%
+                  {diff > 0 ? "+" : ""}{diff.toFixed(1)}
                 </span>
               </div>
-              {/* Dual bar */}
+              {/* Dual bar on 1-8 scale */}
               <div style={{ position: "relative", height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
                 <div style={{ position: "absolute", height: "100%", width: `${d.pct}%`, background: d.domain.color, borderRadius: 3, opacity: 0.6 }} />
-                <div style={{ position: "absolute", height: "100%", width: 2, left: `${Math.min(rPct, 100)}%`, background: "#475569", borderRadius: 1 }} />
+                <div style={{ position: "absolute", height: "100%", width: 2, left: `${menqolToPct(refMean)}%`, background: "#475569", borderRadius: 1 }} />
               </div>
             </div>
           )
@@ -452,10 +453,9 @@ function ResultsView({ answers, age, weight, onReset }) {
         <div style={{ marginTop: 14, background: "#F8FAFC", borderRadius: 10, padding: 12 }}>
           <p style={{ fontSize: 11, color: "#94A3B8", lineHeight: 1.6 }}>
             Referencia: Minnesota Green Tea Trial (n=932 mujeres postmenopáusicas, EE.UU.).
-            Escala MENQOL 1-8 donde 1 = sin síntoma y 8 = extremadamente molesto.
-            Tu puntuación se ha convertido a esta escala para permitir la comparación.
-            * Una diferencia ≥13% se considera clínicamente significativa (MCID).
-            Mayor % = mayor impacto de síntomas.
+            Escala MENQOL original 1-8 (1 = sin síntoma, 8 = extremadamente molesto).
+            * Diferencia clínicamente significativa (MCID ≥ 0.9 puntos).
+            Mayor puntuación = mayor impacto de síntomas.
           </p>
         </div>
       </div>
@@ -489,10 +489,10 @@ function ResultsView({ answers, age, weight, onReset }) {
                   {present && rating && (
                     <span style={{
                       fontSize: 12, fontWeight: 700,
-                      color: rating <= 3 ? "#22C55E" : rating <= 6 ? "#F59E0B" : "#EF4444",
-                      background: rating <= 3 ? "#F0FDF4" : rating <= 6 ? "#FFFBEB" : "#FEF2F2",
+                      color: rating <= 4 ? "#22C55E" : rating <= 6 ? "#F59E0B" : "#EF4444",
+                      background: rating <= 4 ? "#F0FDF4" : rating <= 6 ? "#FFFBEB" : "#FEF2F2",
                       padding: "2px 8px", borderRadius: 6
-                    }}>{rating}/10</span>
+                    }}>{rating}/8</span>
                   )}
                 </div>
               )
@@ -570,7 +570,7 @@ export default function App() {
     DOMAINS.forEach(d => d.items.forEach(item => {
       const present = Math.random() > 0.35
       rand[item.id] = present
-        ? { present: true, rating: Math.floor(Math.random() * 10) + 1 }
+        ? { present: true, rating: Math.floor(Math.random() * 7) + 2 }
         : { present: false, rating: null }
     }))
     setAnswers(rand)
