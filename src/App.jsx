@@ -146,6 +146,81 @@ function QuestionItem({ item, domain, answer, onAnswer, openTooltip, setOpenTool
   )
 }
 
+/* ─── Radar Chart (Spider) ─── */
+function RadarChart({ domainResults }) {
+  const cx = 150, cy = 150, r = 110
+  const n = domainResults.length
+  const angleStep = (2 * Math.PI) / n
+  const startAngle = -Math.PI / 2 // top
+
+  const point = (i, pct) => {
+    const a = startAngle + i * angleStep
+    return [cx + r * (pct / 100) * Math.cos(a), cy + r * (pct / 100) * Math.sin(a)]
+  }
+
+  const gridLevels = [20, 40, 60, 80, 100]
+
+  const dataPoints = domainResults.map((d, i) => point(i, d.pct))
+  const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + " Z"
+
+  // Label positions pushed further out
+  const labelPos = domainResults.map((_, i) => {
+    const a = startAngle + i * angleStep
+    return [cx + (r + 30) * Math.cos(a), cy + (r + 30) * Math.sin(a)]
+  })
+
+  return (
+    <div style={{
+      background: "white", borderRadius: 16, padding: "20px 8px 12px",
+      border: "1.5px solid #F1F5F9", marginBottom: 16
+    }}>
+      <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1E293B", marginBottom: 4, textAlign: "center" }}>
+        Perfil de síntomas
+      </h3>
+      <svg viewBox="0 0 300 300" style={{ width: "100%", maxWidth: 340, display: "block", margin: "0 auto" }}>
+        {/* Grid polygons */}
+        {gridLevels.map(level => {
+          const pts = Array.from({ length: n }, (_, i) => point(i, level))
+          const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + " Z"
+          return <path key={level} d={path} fill="none" stroke="#E2E8F0" strokeWidth={level === 100 ? 1.5 : 0.8} />
+        })}
+
+        {/* Axis lines */}
+        {domainResults.map((_, i) => {
+          const [ex, ey] = point(i, 100)
+          return <line key={i} x1={cx} y1={cy} x2={ex} y2={ey} stroke="#E2E8F0" strokeWidth={0.8} />
+        })}
+
+        {/* Data polygon */}
+        <path d={dataPath} fill="rgba(124, 156, 232, 0.18)" stroke="#7C9CE8" strokeWidth={2.5} strokeLinejoin="round" />
+
+        {/* Data dots + values */}
+        {dataPoints.map((p, i) => (
+          <g key={i}>
+            <circle cx={p[0]} cy={p[1]} r={4.5} fill={domainResults[i].domain.color} stroke="white" strokeWidth={2} />
+          </g>
+        ))}
+
+        {/* Labels */}
+        {domainResults.map((d, i) => {
+          const [lx, ly] = labelPos[i]
+          const anchor = i === 0 || i === 2 ? "middle" : i === 1 ? "start" : "end"
+          return (
+            <g key={d.domain.id}>
+              <text x={lx} y={ly - 6} textAnchor={anchor} fontSize={11} fontWeight={700} fill={d.domain.color}>
+                {d.domain.emoji} {d.pct}%
+              </text>
+              <text x={lx} y={ly + 8} textAnchor={anchor} fontSize={9.5} fontWeight={500} fill="#64748B">
+                {d.domain.name.replace("Síntomas ", "")}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
+  )
+}
+
 /* ─── Results View ─── */
 function ResultsView({ answers, age, weight, onReset }) {
   const domainResults = DOMAINS.map(domain => {
@@ -190,6 +265,9 @@ function ResultsView({ answers, age, weight, onReset }) {
           {dateStr}{age ? ` · ${age} años` : ""}{weight ? ` · ${weight} kg` : ""}
         </p>
       </div>
+
+      {/* Radar chart */}
+      <RadarChart domainResults={domainResults} />
 
       {/* Domain bars */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
