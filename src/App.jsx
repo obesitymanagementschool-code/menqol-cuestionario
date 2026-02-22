@@ -11,6 +11,28 @@ const getLevel = (pct) => {
   return { label: "Impacto severo", color: "#EF4444", bg: "#FEF2F2" }
 }
 
+/* ─── Reference data: Minnesota Green Tea Trial (n=932), escala MENQOL 1-8 ─── */
+const REFERENCE = {
+  "50-54": { vasomotor: 3.66, psychosocial: 2.81, physical: 3.01, sexual: 3.19, global: 3.04 },
+  "55-59": { vasomotor: 3.06, psychosocial: 2.60, physical: 2.95, sexual: 3.27, global: 2.90 },
+  "60-64": { vasomotor: 2.50, psychosocial: 2.39, physical: 2.88, sexual: 3.12, global: 2.76 },
+  "65+":   { vasomotor: 2.01, psychosocial: 2.14, physical: 2.67, sexual: 2.95, global: 2.51 },
+}
+
+const getAgeGroup = (age) => {
+  const a = parseInt(age)
+  if (!a || a < 55) return "50-54"
+  if (a < 60) return "55-59"
+  if (a < 65) return "60-64"
+  return "65+"
+}
+
+// MENQOL 1-8 → 0-100%
+const menqolToPct = (v) => (v - 1) / 7 * 100
+
+// MCID = 0.9 points on 1-8 scale → ~12.86% on 0-100%
+const MCID_PCT = 0.9 / 7 * 100
+
 /* ─── Info Bottom Sheet ─── */
 function InfoSheet({ item, onClose }) {
   return (
@@ -147,7 +169,7 @@ function QuestionItem({ item, domain, answer, onAnswer, openTooltip, setOpenTool
 }
 
 /* ─── Radar Chart (Spider) ─── */
-function RadarChart({ domainResults }) {
+function RadarChart({ domainResults, refPcts, ageGroup }) {
   const cx = 150, cy = 150, r = 110
   const n = domainResults.length
   const angleStep = (2 * Math.PI) / n
@@ -158,10 +180,12 @@ function RadarChart({ domainResults }) {
     return [cx + r * (pct / 100) * Math.cos(a), cy + r * (pct / 100) * Math.sin(a)]
   }
 
+  const makePath = (pts) => pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + " Z"
+
   const gridLevels = [20, 40, 60, 80, 100]
 
   const dataPoints = domainResults.map((d, i) => point(i, d.pct))
-  const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + " Z"
+  const refPoints = refPcts ? refPcts.map((p, i) => point(i, p)) : null
 
   // Label positions pushed further out
   const labelPos = domainResults.map((_, i) => {
@@ -181,8 +205,7 @@ function RadarChart({ domainResults }) {
         {/* Grid polygons */}
         {gridLevels.map(level => {
           const pts = Array.from({ length: n }, (_, i) => point(i, level))
-          const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + " Z"
-          return <path key={level} d={path} fill="none" stroke="#E2E8F0" strokeWidth={level === 100 ? 1.5 : 0.8} />
+          return <path key={level} d={makePath(pts)} fill="none" stroke="#E2E8F0" strokeWidth={level === 100 ? 1.5 : 0.8} />
         })}
 
         {/* Axis lines */}
@@ -191,14 +214,23 @@ function RadarChart({ domainResults }) {
           return <line key={i} x1={cx} y1={cy} x2={ex} y2={ey} stroke="#E2E8F0" strokeWidth={0.8} />
         })}
 
-        {/* Data polygon */}
-        <path d={dataPath} fill="rgba(124, 156, 232, 0.18)" stroke="#7C9CE8" strokeWidth={2.5} strokeLinejoin="round" />
+        {/* Reference polygon (dashed, behind) */}
+        {refPoints && (
+          <path d={makePath(refPoints)} fill="rgba(148, 163, 184, 0.10)" stroke="#94A3B8" strokeWidth={1.8}
+            strokeDasharray="6 4" strokeLinejoin="round" />
+        )}
 
-        {/* Data dots + values */}
+        {/* Reference dots */}
+        {refPoints && refPoints.map((p, i) => (
+          <circle key={`ref-${i}`} cx={p[0]} cy={p[1]} r={3} fill="#94A3B8" stroke="white" strokeWidth={1.5} />
+        ))}
+
+        {/* Data polygon */}
+        <path d={makePath(dataPoints)} fill="rgba(124, 156, 232, 0.18)" stroke="#7C9CE8" strokeWidth={2.5} strokeLinejoin="round" />
+
+        {/* Data dots */}
         {dataPoints.map((p, i) => (
-          <g key={i}>
-            <circle cx={p[0]} cy={p[1]} r={4.5} fill={domainResults[i].domain.color} stroke="white" strokeWidth={2} />
-          </g>
+          <circle key={i} cx={p[0]} cy={p[1]} r={4.5} fill={domainResults[i].domain.color} stroke="white" strokeWidth={2} />
         ))}
 
         {/* Labels */}
@@ -217,6 +249,18 @@ function RadarChart({ domainResults }) {
           )
         })}
       </svg>
+
+      {/* Legend */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 4, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ width: 18, height: 4, borderRadius: 2, background: "#7C9CE8" }} />
+          <span style={{ fontSize: 11, color: "#475569" }}>Tu resultado</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ width: 18, height: 0, borderTop: "2px dashed #94A3B8" }} />
+          <span style={{ fontSize: 11, color: "#94A3B8" }}>Media pobl. ({ageGroup})</span>
+        </div>
+      </div>
     </div>
   )
 }
@@ -238,6 +282,16 @@ function ResultsView({ answers, age, weight, onReset }) {
   const overallMax = 29 * 10
   const overallPct = Math.round(overallTotal / overallMax * 100)
   const overall = getLevel(overallPct)
+
+  // Reference data
+  const ageGroup = getAgeGroup(age)
+  const ref = REFERENCE[ageGroup]
+  const ageUnder50 = age && parseInt(age) < 50
+
+  // Domain order matches DOMAINS: vasomotor, psychosocial, physical, sexual
+  const domainKeys = ["vasomotor", "psychosocial", "physical", "sexual"]
+  const refPcts = domainKeys.map(k => menqolToPct(ref[k]))
+  const refGlobalPct = menqolToPct(ref.global)
 
   const dateStr = new Date().toLocaleDateString("es-ES", {
     day: "numeric", month: "long", year: "numeric"
@@ -267,7 +321,7 @@ function ResultsView({ answers, age, weight, onReset }) {
       </div>
 
       {/* Radar chart */}
-      <RadarChart domainResults={domainResults} />
+      <RadarChart domainResults={domainResults} refPcts={refPcts} ageGroup={ageGroup} />
 
       {/* Domain bars */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -298,6 +352,112 @@ function ResultsView({ answers, age, weight, onReset }) {
             </div>
           )
         })}
+      </div>
+
+      {/* Comparison with reference */}
+      <div style={{
+        background: "white", borderRadius: 16, padding: 16, marginTop: 16,
+        border: "1.5px solid #F1F5F9"
+      }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1E293B", marginBottom: 14 }}>
+          Comparativa con estudio de referencia
+        </h3>
+
+        {ageUnder50 && (
+          <div style={{
+            background: "#FFFBEB", borderRadius: 10, padding: 10, marginBottom: 12,
+            border: "1px solid #FDE68A", fontSize: 12, color: "#92400E", lineHeight: 1.5
+          }}>
+            Tu edad est&aacute; fuera del rango del estudio de referencia (50-65+). Se usa el grupo 50-54 como aproximaci&oacute;n.
+          </div>
+        )}
+
+        {/* Global row */}
+        {(() => {
+          const diff = overallPct - refGlobalPct
+          const absDiff = Math.abs(diff)
+          const significant = absDiff >= MCID_PCT
+          const better = diff < 0
+          const neutral = absDiff < (0.5 / 7 * 100)
+          const diffColor = neutral ? "#F59E0B" : better ? "#22C55E" : "#EF4444"
+          const diffBg = neutral ? "#FFFBEB" : better ? "#F0FDF4" : "#FEF2F2"
+          const diffLabel = neutral ? "En la media" : better ? "Por debajo" : "Por encima"
+          return (
+            <div style={{
+              background: "#F8FAFC", borderRadius: 12, padding: 12, marginBottom: 10,
+              border: "1px solid #E2E8F0"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#1E293B" }}>Global</span>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: diffColor, background: diffBg,
+                  padding: "2px 8px", borderRadius: 6
+                }}>{diffLabel}{significant ? " *" : ""}</span>
+              </div>
+              <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#64748B", marginBottom: 6 }}>
+                <span>T&uacute;: <strong style={{ color: "#1E293B" }}>{overallPct}%</strong></span>
+                <span>Ref: <strong style={{ color: "#94A3B8" }}>{Math.round(refGlobalPct)}%</strong></span>
+                <span style={{ color: diffColor, fontWeight: 600 }}>
+                  {diff > 0 ? "+" : ""}{Math.round(diff)}%
+                </span>
+              </div>
+              {/* Dual bar */}
+              <div style={{ position: "relative", height: 8, background: "#E2E8F0", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ position: "absolute", height: "100%", width: `${overallPct}%`, background: "#7C9CE8", borderRadius: 4, opacity: 0.7 }} />
+                <div style={{ position: "absolute", height: "100%", width: 2, left: `${Math.min(refGlobalPct, 100)}%`, background: "#475569", borderRadius: 1 }} />
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Per-domain rows */}
+        {domainResults.map((d, i) => {
+          const rPct = refPcts[i]
+          const diff = d.pct - rPct
+          const absDiff = Math.abs(diff)
+          const significant = absDiff >= MCID_PCT
+          const better = diff < 0
+          const neutral = absDiff < (0.5 / 7 * 100)
+          const diffColor = neutral ? "#F59E0B" : better ? "#22C55E" : "#EF4444"
+          const diffBg = neutral ? "#FFFBEB" : better ? "#F0FDF4" : "#FEF2F2"
+          const diffLabel = neutral ? "En la media" : better ? "Por debajo" : "Por encima"
+          return (
+            <div key={d.domain.id} style={{ padding: "10px 0", borderBottom: i < domainResults.length - 1 ? "1px solid #F1F5F9" : "none" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#1E293B" }}>
+                  {d.domain.emoji} {d.domain.name.replace("Síntomas ", "")}
+                </span>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, color: diffColor, background: diffBg,
+                  padding: "2px 7px", borderRadius: 5
+                }}>{diffLabel}{significant ? " *" : ""}</span>
+              </div>
+              <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#64748B", marginBottom: 5 }}>
+                <span>T&uacute;: <strong style={{ color: d.domain.color }}>{d.pct}%</strong></span>
+                <span>Ref: <strong style={{ color: "#94A3B8" }}>{Math.round(rPct)}%</strong></span>
+                <span style={{ color: diffColor, fontWeight: 600 }}>
+                  {diff > 0 ? "+" : ""}{Math.round(diff)}%
+                </span>
+              </div>
+              {/* Dual bar */}
+              <div style={{ position: "relative", height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ position: "absolute", height: "100%", width: `${d.pct}%`, background: d.domain.color, borderRadius: 3, opacity: 0.6 }} />
+                <div style={{ position: "absolute", height: "100%", width: 2, left: `${Math.min(rPct, 100)}%`, background: "#475569", borderRadius: 1 }} />
+              </div>
+            </div>
+          )
+        })}
+
+        {/* Footnote */}
+        <div style={{ marginTop: 14, background: "#F8FAFC", borderRadius: 10, padding: 12 }}>
+          <p style={{ fontSize: 11, color: "#94A3B8", lineHeight: 1.6 }}>
+            Referencia: Minnesota Green Tea Trial (n=932 mujeres postmenopáusicas, EE.UU.).
+            Escala MENQOL 1-8 donde 1 = sin síntoma y 8 = extremadamente molesto.
+            Tu puntuación se ha convertido a esta escala para permitir la comparación.
+            * Una diferencia ≥13% se considera clínicamente significativa (MCID).
+            Mayor % = mayor impacto de síntomas.
+          </p>
+        </div>
       </div>
 
       {/* Item detail */}
