@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { DOMAINS } from './data.js'
+import { supabase } from './supabase.js'
 import './styles.css'
 
 /* ─── Helpers ─── */
@@ -267,6 +268,29 @@ function RadarChart({ domainResults, refPcts, ageGroup }) {
 
 /* ─── Results View ─── */
 function ResultsView({ answers, age, weight, onReset }) {
+  const [saveStatus, setSaveStatus] = useState(null) // null | "saving" | "saved" | "error"
+
+  const handleSave = async (domainResults, overallMean) => {
+    setSaveStatus("saving")
+    try {
+      const { error } = await supabase.from("responses").insert({
+        age: age ? parseInt(age) : null,
+        weight: weight ? parseFloat(weight) : null,
+        answers,
+        score_vasomotor: domainResults[0].mean,
+        score_psychosocial: domainResults[1].mean,
+        score_physical: domainResults[2].mean,
+        score_sexual: domainResults[3].mean,
+        score_global: overallMean,
+      })
+      if (error) throw error
+      setSaveStatus("saved")
+    } catch (e) {
+      console.error("Error saving:", e)
+      setSaveStatus("error")
+    }
+  }
+
   const domainResults = DOMAINS.map(domain => {
     let scoreSum = 0, yesCount = 0
     domain.items.forEach(item => {
@@ -514,17 +538,36 @@ function ResultsView({ answers, age, weight, onReset }) {
       </div>
 
       {/* Actions */}
-      <div className="no-print" style={{ display: "flex", gap: 10, marginTop: 16 }}>
-        <button onClick={() => window.print()} style={{
-          flex: 1, padding: 14, borderRadius: 14,
-          background: "white", color: "#475569", border: "1.5px solid #E2E8F0",
-          fontSize: 14, fontWeight: 600, cursor: "pointer"
-        }}>🖨 Imprimir</button>
-        <button onClick={onReset} style={{
-          flex: 1, padding: 14, borderRadius: 14,
-          background: "white", color: "#475569", border: "1.5px solid #E2E8F0",
-          fontSize: 14, fontWeight: 600, cursor: "pointer"
-        }}>↻ Repetir</button>
+      <div className="no-print" style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+        <button
+          onClick={() => handleSave(domainResults, overallMean)}
+          disabled={saveStatus === "saving" || saveStatus === "saved"}
+          style={{
+            width: "100%", padding: 14, borderRadius: 14,
+            background: saveStatus === "saved" ? "#22C55E" : saveStatus === "error" ? "#EF4444" : "#1E293B",
+            color: "white", border: "none",
+            fontSize: 15, fontWeight: 700, cursor: saveStatus === "saved" ? "default" : "pointer",
+            boxShadow: saveStatus === "saved" ? "none" : "0 4px 15px rgba(30,41,59,0.3)",
+            transition: "all 0.2s"
+          }}
+        >
+          {saveStatus === "saving" ? "Guardando..." :
+           saveStatus === "saved" ? "Guardado" :
+           saveStatus === "error" ? "Error — Reintentar" :
+           "Guardar resultados"}
+        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => window.print()} style={{
+            flex: 1, padding: 14, borderRadius: 14,
+            background: "white", color: "#475569", border: "1.5px solid #E2E8F0",
+            fontSize: 14, fontWeight: 600, cursor: "pointer"
+          }}>Imprimir</button>
+          <button onClick={onReset} style={{
+            flex: 1, padding: 14, borderRadius: 14,
+            background: "white", color: "#475569", border: "1.5px solid #E2E8F0",
+            fontSize: 14, fontWeight: 600, cursor: "pointer"
+          }}>Repetir</button>
+        </div>
       </div>
     </div>
   )
