@@ -162,6 +162,13 @@ function FilterBar({ filters, onChange, total }) {
   )
 }
 
+/* ─── Audit logger ─── */
+const logAudit = async (userEmail, action, details = {}) => {
+  try {
+    await supabase.from('audit_log').insert({ user_email: userEmail, action, details })
+  } catch {}
+}
+
 /* ═══════════════════════════════════════════
    MAIN DASHBOARD
    ═══════════════════════════════════════════ */
@@ -172,6 +179,28 @@ export default function Dashboard({ onBack }) {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('resumen')
   const [filters, setFilters] = useState({})
+
+  // Session timeout (30 min inactivity)
+  useEffect(() => {
+    if (!user) return
+    let timer
+    const resetTimer = () => {
+      clearTimeout(timer)
+      timer = setTimeout(async () => {
+        logAudit(user.email, 'session_timeout')
+        await supabase.auth.signOut()
+        setUser(null)
+        alert("Sesión cerrada por inactividad (30 min)")
+      }, 30 * 60 * 1000)
+    }
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart']
+    events.forEach(e => window.addEventListener(e, resetTimer))
+    resetTimer()
+    return () => {
+      clearTimeout(timer)
+      events.forEach(e => window.removeEventListener(e, resetTimer))
+    }
+  }, [user])
 
   // Check existing session
   useEffect(() => {
@@ -186,9 +215,10 @@ export default function Dashboard({ onBack }) {
     if (!user) return
     setLoading(true)
     supabase.from('responses').select('*').order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (!error) setRawData(data || [])
+      .then(({ data: respData, error }) => {
+        if (!error) setRawData(respData || [])
         setLoading(false)
+        logAudit(user.email, 'view_data', { count: respData?.length || 0 })
       })
   }, [user])
 
@@ -206,7 +236,10 @@ export default function Dashboard({ onBack }) {
   }, [rawData, filters])
 
   const handleLogin = () => {
-    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user))
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user)
+      if (session?.user) logAudit(session.user.email, 'login')
+    })
   }
 
   const handleLogout = async () => {
@@ -215,6 +248,7 @@ export default function Dashboard({ onBack }) {
   }
 
   const handleClearAll = async () => {
+    logAudit(user?.email, 'delete_all', { count: rawData.length })
     await supabase.from('responses').delete().gt('created_at', '1970-01-01')
     setRawData([])
   }
@@ -243,14 +277,16 @@ export default function Dashboard({ onBack }) {
         return a?.present ? a.rating : 1
       })
     ])
-    const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n')
+    const watermark = `# CONFIDENCIAL - Exportado por ${user?.email || 'unknown'} - ${new Date().toISOString()} - Estudio MENQOL`
+    const csv = [watermark, headers.join(';'), ...rows.map(r => r.join(';'))].join('\n')
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `menqol-datos-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `menqol-${(user?.email || 'export').split('@')[0]}-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
+    logAudit(user?.email, 'export_csv', { count: data.length, filters })
   }
 
   // ─── Computed stats ───
@@ -664,16 +700,22 @@ export default function Dashboard({ onBack }) {
       </>}
 
       {/* ═══ TAB: GESTIÓN ═══ */}
-      {tab === 'gestion' && <GestionTab data={data} onClear={handleClearAll} onExport={exportCSV} onRefresh={refreshData} />}
+      {tab === 'gestion' && <GestionTab data={data} onClear={handleClearAll} onExport={exportCSV} onRefresh={refreshData} user={user} onDeleteByCode={(id) => setRawData(prev => prev.filter(r => r.id !== id))} />}
     </div>
   )
 }
 
 /* ─── Gestión Tab (separate for state) ─── */
-function GestionTab({ data, onClear, onExport, onRefresh }) {
+function GestionTab({ data, onClear, onExport, onRefresh, user, onDeleteByCode }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleteText, setDeleteText] = useState("")
   const [deleting, setDeleting] = useState(false)
+  const [codeSearch, setCodeSearch] = useState("")
+  const [codeResult, setCodeResult] = useState(null) // null | { found, record } | "searching" | "deleted"
+  const [codeDeleting, setCodeDeleting] = useState(false)
+  const [auditLogs, setAuditLogs] = useState([])
+  const [showAudit, setShowAudit] = useState(false)
+  const [auditLoading, setAuditLoading] = useState(false)
 
   const handleDelete = async () => {
     setDeleting(true)
@@ -681,6 +723,49 @@ function GestionTab({ data, onClear, onExport, onRefresh }) {
     setDeleting(false)
     setConfirmDelete(false)
     setDeleteText("")
+  }
+
+  const handleCodeSearch = async () => {
+    if (!codeSearch.trim()) return
+    setCodeResult("searching")
+    const { data: records, error } = await supabase
+      .from('responses')
+      .select('id, created_at, age, weight, score_global, deletion_code')
+      .eq('deletion_code', codeSearch.trim().toUpperCase())
+    if (error || !records?.length) {
+      setCodeResult({ found: false })
+    } else {
+      setCodeResult({ found: true, record: records[0] })
+    }
+  }
+
+  const handleCodeDelete = async () => {
+    if (!codeResult?.record) return
+    setCodeDeleting(true)
+    const { error } = await supabase
+      .from('responses')
+      .delete()
+      .eq('id', codeResult.record.id)
+    if (!error) {
+      logAudit(user?.email, 'delete_by_code', {
+        deletion_code: codeResult.record.deletion_code,
+        response_id: codeResult.record.id,
+      })
+      setCodeResult("deleted")
+      onDeleteByCode(codeResult.record.id)
+    }
+    setCodeDeleting(false)
+  }
+
+  const loadAuditLog = async () => {
+    setAuditLoading(true)
+    const { data: logs } = await supabase
+      .from('audit_log')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50)
+    setAuditLogs(logs || [])
+    setAuditLoading(false)
   }
 
   return (
@@ -703,6 +788,131 @@ function GestionTab({ data, onClear, onExport, onRefresh }) {
           padding: "10px 20px", borderRadius: 10, background: "white",
           color: "#475569", border: "1.5px solid #E2E8F0", fontSize: 14, fontWeight: 600, cursor: "pointer"
         }}>Recargar desde servidor</button>
+      </div>
+
+      {/* Search/delete by deletion code (GDPR Art. 17) */}
+      <div style={{ ...card, borderColor: "#BBF7D0" }}>
+        <p style={{ ...sectionTitle, color: "#166534" }}>Derecho de supresión (RGPD Art. 17)</p>
+        <p style={{ fontSize: 13, color: "#64748B", marginBottom: 12, lineHeight: 1.5 }}>
+          Busca una respuesta por su código de referencia para ejercer el derecho de supresión
+          del participante.
+        </p>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <input
+            value={codeSearch}
+            onChange={e => setCodeSearch(e.target.value.toUpperCase())}
+            placeholder="Código (ej: A3KM7NP2)"
+            maxLength={8}
+            style={{
+              padding: "10px 14px", borderRadius: 10, border: "1.5px solid #E2E8F0",
+              fontSize: 15, fontWeight: 600, letterSpacing: 2, flex: 1, outline: "none",
+              fontFamily: "monospace", textTransform: "uppercase"
+            }}
+          />
+          <button
+            onClick={handleCodeSearch}
+            disabled={!codeSearch.trim() || codeResult === "searching"}
+            style={{
+              padding: "10px 16px", borderRadius: 10, background: "#1E293B",
+              color: "white", border: "none", fontSize: 13, fontWeight: 600,
+              cursor: codeSearch.trim() ? "pointer" : "not-allowed"
+            }}
+          >{codeResult === "searching" ? "..." : "Buscar"}</button>
+        </div>
+
+        {codeResult && codeResult !== "searching" && codeResult !== "deleted" && !codeResult.found && (
+          <div style={{
+            background: "#FEF2F2", borderRadius: 10, padding: 12,
+            border: "1px solid #FECACA", fontSize: 13, color: "#991B1B"
+          }}>
+            No se encontró ninguna respuesta con ese código.
+          </div>
+        )}
+
+        {codeResult?.found && codeResult.record && (
+          <div style={{
+            background: "#F0FDF4", borderRadius: 10, padding: 14,
+            border: "1px solid #BBF7D0"
+          }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "#166534", marginBottom: 8 }}>
+              Respuesta encontrada:
+            </p>
+            <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.8 }}>
+              <div>ID: <span style={{ fontFamily: "monospace" }}>{codeResult.record.id.slice(0, 8)}...</span></div>
+              <div>Fecha: {new Date(codeResult.record.created_at).toLocaleString("es-ES")}</div>
+              {codeResult.record.age && <div>Edad: {codeResult.record.age}</div>}
+              <div>Score global: {codeResult.record.score_global}</div>
+            </div>
+            <button
+              onClick={handleCodeDelete}
+              disabled={codeDeleting}
+              style={{
+                marginTop: 12, padding: "10px 20px", borderRadius: 10,
+                background: "#EF4444", color: "white", border: "none",
+                fontSize: 13, fontWeight: 700, cursor: "pointer"
+              }}
+            >{codeDeleting ? "Eliminando..." : "Eliminar esta respuesta"}</button>
+          </div>
+        )}
+
+        {codeResult === "deleted" && (
+          <div style={{
+            background: "#F0FDF4", borderRadius: 10, padding: 12,
+            border: "1px solid #BBF7D0", fontSize: 13, color: "#166534", fontWeight: 600
+          }}>
+            ✅ Respuesta eliminada correctamente. Los datos han sido suprimidos de la base de datos.
+          </div>
+        )}
+      </div>
+
+      {/* Audit log viewer */}
+      <div style={card}>
+        <p style={sectionTitle}>Registro de actividad</p>
+        <p style={{ fontSize: 13, color: "#64748B", marginBottom: 12, lineHeight: 1.5 }}>
+          Últimas 50 acciones registradas en el sistema (SOC 2 — Logging).
+        </p>
+        <button
+          onClick={() => { setShowAudit(!showAudit); if (!showAudit && !auditLogs.length) loadAuditLog() }}
+          style={{
+            padding: "10px 20px", borderRadius: 10, background: "white",
+            color: "#475569", border: "1.5px solid #E2E8F0", fontSize: 14, fontWeight: 600, cursor: "pointer"
+          }}
+        >{showAudit ? "Ocultar registro" : "Ver registro"}</button>
+
+        {showAudit && (
+          <div style={{ marginTop: 12, maxHeight: 300, overflowY: "auto" }}>
+            {auditLoading ? (
+              <p style={{ fontSize: 13, color: "#94A3B8" }}>Cargando...</p>
+            ) : auditLogs.length === 0 ? (
+              <p style={{ fontSize: 13, color: "#94A3B8" }}>No hay registros de actividad.</p>
+            ) : (
+              <table style={{ width: "100%", fontSize: 11, borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #E2E8F0" }}>
+                    <th style={{ textAlign: "left", padding: 4, color: "#475569" }}>Fecha</th>
+                    <th style={{ textAlign: "left", padding: 4, color: "#475569" }}>Usuario</th>
+                    <th style={{ textAlign: "left", padding: 4, color: "#475569" }}>Acción</th>
+                    <th style={{ textAlign: "left", padding: 4, color: "#475569" }}>Detalles</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditLogs.map(log => (
+                    <tr key={log.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      <td style={{ padding: 4, color: "#94A3B8", whiteSpace: "nowrap" }}>
+                        {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td style={{ padding: 4, color: "#64748B" }}>{log.user_email?.split('@')[0]}</td>
+                      <td style={{ padding: 4, fontWeight: 600, color: "#1E293B" }}>{log.action}</td>
+                      <td style={{ padding: 4, color: "#94A3B8", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {log.details ? JSON.stringify(log.details).slice(0, 60) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
 
       <div style={{ ...card, borderColor: "#FECACA" }}>

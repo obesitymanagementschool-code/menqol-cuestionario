@@ -3,6 +3,8 @@ import { DOMAINS } from './data.js'
 import { supabase } from './supabase.js'
 import Dashboard from './Dashboard.jsx'
 import AboutPage from './AboutPage.jsx'
+import ConsentModal from './ConsentModal.jsx'
+import PrivacyPolicy from './PrivacyPolicy.jsx'
 import './styles.css'
 
 /* ─── Helpers ─── */
@@ -269,12 +271,25 @@ function RadarChart({ domainResults, refPcts, ageGroup }) {
 }
 
 /* ─── Results View ─── */
-function ResultsView({ answers, age, weight, onReset }) {
-  const [saveStatus, setSaveStatus] = useState(null) // null | "saving" | "saved" | "error"
+function ResultsView({ answers, age, weight, onReset, onOpenPrivacy }) {
+  const [saveStatus, setSaveStatus] = useState(null) // null | "consent" | "saving" | "saved" | "error"
+  const [deletionCode, setDeletionCode] = useState(null)
 
-  const handleSave = async (domainResults, overallMean) => {
+  const generateDeletionCode = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    let code = ""
+    for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)]
+    return code
+  }
+
+  const handleSaveClick = (domainResults, overallMean) => {
+    setSaveStatus("consent")
+  }
+
+  const handleConsentAccepted = async (domainResults, overallMean) => {
     setSaveStatus("saving")
     try {
+      const code = generateDeletionCode()
       const { error } = await supabase.from("responses").insert({
         age: age ? parseInt(age) : null,
         weight: weight ? parseFloat(weight) : null,
@@ -284,8 +299,12 @@ function ResultsView({ answers, age, weight, onReset }) {
         score_physical: domainResults[2].mean,
         score_sexual: domainResults[3].mean,
         score_global: overallMean,
+        consent_given: true,
+        consent_date: new Date().toISOString(),
+        deletion_code: code,
       })
       if (error) throw error
+      setDeletionCode(code)
       setSaveStatus("saved")
     } catch (e) {
       console.error("Error saving:", e)
@@ -539,11 +558,38 @@ function ResultsView({ answers, age, weight, onReset }) {
         </p>
       </div>
 
+      {/* Deletion code display */}
+      {deletionCode && (
+        <div style={{
+          background: "#F0FDF4", borderRadius: 14, padding: 16, marginTop: 16,
+          border: "1.5px solid #BBF7D0", textAlign: "center"
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#166534", marginBottom: 8 }}>
+            ✅ Datos guardados correctamente
+          </div>
+          <div style={{ fontSize: 12, color: "#166534", marginBottom: 12, lineHeight: 1.5 }}>
+            Tu código de referencia para ejercer tus derechos (acceso, rectificación, supresión):
+          </div>
+          <div style={{
+            background: "white", borderRadius: 10, padding: "12px 16px",
+            border: "1.5px solid #BBF7D0", display: "inline-block",
+            fontSize: 22, fontWeight: 800, letterSpacing: 3, color: "#1E293B",
+            fontFamily: "monospace"
+          }}>
+            {deletionCode}
+          </div>
+          <div style={{ fontSize: 11, color: "#64748B", marginTop: 10, lineHeight: 1.5 }}>
+            Guarda este código en un lugar seguro. Lo necesitarás si deseas solicitar
+            la eliminación de tus datos.
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="no-print" style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
         <button
-          onClick={() => handleSave(domainResults, overallMean)}
-          disabled={saveStatus === "saving" || saveStatus === "saved"}
+          onClick={() => handleSaveClick(domainResults, overallMean)}
+          disabled={saveStatus === "saving" || saveStatus === "saved" || saveStatus === "consent"}
           style={{
             width: "100%", padding: 14, borderRadius: 14,
             background: saveStatus === "saved" ? "#22C55E" : saveStatus === "error" ? "#EF4444" : "#1E293B",
@@ -554,10 +600,19 @@ function ResultsView({ answers, age, weight, onReset }) {
           }}
         >
           {saveStatus === "saving" ? "Guardando..." :
-           saveStatus === "saved" ? "Guardado" :
+           saveStatus === "saved" ? "✅ Guardado para investigación" :
            saveStatus === "error" ? "Error — Reintentar" :
-           "Guardar resultados"}
+           "🔒 Guardar para investigación"}
         </button>
+
+      {/* Consent Modal */}
+      {saveStatus === "consent" && (
+        <ConsentModal
+          onAccept={() => handleConsentAccepted(domainResults, overallMean)}
+          onCancel={() => setSaveStatus(null)}
+          onOpenPrivacy={onOpenPrivacy}
+        />
+      )}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => window.print()} style={{
             flex: 1, padding: 14, borderRadius: 14,
@@ -730,6 +785,12 @@ export default function App() {
               fontSize: 13, fontWeight: 500, cursor: "pointer",
               textDecoration: "underline", textUnderlineOffset: 3
             }}>ℹ️ Cómo funciona esta app</button>
+            <button onClick={() => setStep("privacy")} style={{
+              width: "100%", padding: 8, marginTop: 4,
+              background: "none", color: "#94A3B8", border: "none",
+              fontSize: 12, fontWeight: 500, cursor: "pointer",
+              textDecoration: "underline", textUnderlineOffset: 3
+            }}>🔒 Política de privacidad</button>
           </div>
         )}
 
@@ -831,7 +892,7 @@ export default function App() {
 
         {/* ── RESULTS ── */}
         {step === "results" && (
-          <ResultsView answers={answers} age={age} weight={weight} onReset={reset} />
+          <ResultsView answers={answers} age={age} weight={weight} onReset={reset} onOpenPrivacy={() => setStep("privacy")} />
         )}
       </div>
 
@@ -840,9 +901,14 @@ export default function App() {
         <Dashboard onBack={() => setStep("intro")} />
       )}
 
+      {/* ── PRIVACY POLICY ── */}
+      {step === "privacy" && (
+        <PrivacyPolicy onBack={() => { setStep("intro"); scrollTop() }} />
+      )}
+
       {/* ── ABOUT PAGE ── */}
       {step === "about" && (
-        <AboutPage onBack={() => { setStep("intro"); scrollTop() }} />
+        <AboutPage onBack={() => { setStep("intro"); scrollTop() }} onOpenPrivacy={() => setStep("privacy")} />
       )}
 
       {/* Tooltip bottom sheet (portal-like) */}

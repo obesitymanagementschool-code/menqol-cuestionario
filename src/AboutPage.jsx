@@ -59,7 +59,7 @@ function ProtectionItem({ emoji, text }) {
   )
 }
 
-export default function AboutPage({ onBack }) {
+export default function AboutPage({ onBack, onOpenPrivacy }) {
   return (
     <div className="fade-in" style={{ maxWidth: 560, margin: "0 auto", padding: "0 16px 60px" }}>
 
@@ -262,6 +262,16 @@ export default function AboutPage({ onBack }) {
         >
           🐙 Ver en GitHub
         </a>
+        <button
+          onClick={onOpenPrivacy}
+          style={{
+            display: "block", margin: "12px auto 0", background: "none",
+            border: "none", color: "#94A3B8", fontSize: 12, fontWeight: 500,
+            cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3
+          }}
+        >
+          🔒 Política de privacidad
+        </button>
       </div>
     </div>
   )
