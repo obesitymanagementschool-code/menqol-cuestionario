@@ -263,20 +263,32 @@ export default function Dashboard({ onBack }) {
   const exportCSV = () => {
     const items = DOMAINS.flatMap(d => d.items)
     const headers = [
-      'id', 'fecha', 'edad', 'peso',
+      'id', 'fecha', 'edad', 'peso', 'version', 'escala', 'etapa_reproductiva', 'ipaq_categoria', 'ipaq_met',
       'score_vasomotor', 'score_psicosocial', 'score_fisico', 'score_sexual', 'score_global',
       ...items.map(i => `item_${i.id}`)
     ]
-    const rows = data.map(r => [
-      r.id,
-      new Date(r.created_at).toLocaleDateString("es-ES"),
-      r.age ?? '', r.weight ?? '',
-      r.score_vasomotor, r.score_psychosocial, r.score_physical, r.score_sexual, r.score_global,
-      ...items.map(i => {
-        const a = r.answers?.[String(i.id)]
-        return a?.present ? a.rating : 1
-      })
-    ])
+    const rows = data.map(r => {
+      const ans = r.answers || {}
+      const scale = ans._scale || '2-8'
+      return [
+        r.id,
+        new Date(r.created_at).toLocaleDateString("es-ES"),
+        r.age ?? '', r.weight ?? '',
+        ans._version || 'legacy',
+        scale,
+        ans._reproductiveStage || '',
+        ans._ipaqScore?.category || '',
+        ans._ipaqScore?.totalMET || '',
+        r.score_vasomotor, r.score_psychosocial, r.score_physical, r.score_sexual, r.score_global,
+        ...items.map(i => {
+          const a = ans[String(i.id)]
+          if (!a?.present) return 1
+          if (a.rating == null) return 1
+          // Convert 0-6 to internal 1-8 for CSV consistency
+          return scale === '0-6' ? a.rating + 2 : a.rating
+        })
+      ]
+    })
     const watermark = `# CONFIDENCIAL - Exportado por ${user?.email || 'unknown'} - ${new Date().toISOString()} - Estudio MENQOL`
     const csv = [watermark, headers.join(';'), ...rows.map(r => r.join(';'))].join('\n')
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
@@ -325,7 +337,11 @@ export default function Dashboard({ onBack }) {
     DOMAINS.flatMap(d => d.items.map(item => {
       const vals = data.map(r => r.answers?.[String(item.id)])
       const presentCount = vals.filter(v => v?.present).length
-      const ratings = vals.filter(v => v?.present && v?.rating).map(v => v.rating)
+      // Handle both 0-6 and 2-8 scales: normalize to internal 1-8
+      const ratings = vals.filter(v => v?.present && v?.rating != null).map(v => {
+        const scale = data.find(r => r.answers?.[String(item.id)] === v)?.answers?._scale
+        return scale === '0-6' ? v.rating + 2 : v.rating
+      })
       return {
         id: item.id, label: item.label,
         domain: d.name.replace("Síntomas ", ""), domainColor: d.color,
@@ -407,6 +423,20 @@ export default function Dashboard({ onBack }) {
           <Kpi label="Peso medio" value={weights.length ? avg(weights).toFixed(0) + " kg" : "—"} sub={weights.length ? `SD ${sd(weights).toFixed(1)}` : ""} />
           <Kpi label="Score global" value={globals.length ? avg(globals).toFixed(2) : "—"} sub={globals.length ? `SD ${sd(globals).toFixed(2)} / 8` : ""} />
         </div>
+        {/* Version breakdown */}
+        {(() => {
+          const fullCount = data.filter(r => r.answers?._version === 'full').length
+          const quickCount = data.filter(r => r.answers?._version === 'quick').length
+          const legacyCount = data.length - fullCount - quickCount
+          return (fullCount > 0 || quickCount > 0) ? (
+            <div style={{ ...card, display: "flex", gap: 10, padding: "10px 14px", marginBottom: 14 }}>
+              <span style={{ fontSize: 12, color: "#475569", fontWeight: 600 }}>Versiones:</span>
+              {fullCount > 0 && <span style={{ fontSize: 12, color: "#7C9CE8", background: "#EEF2FF", padding: "2px 8px", borderRadius: 6, fontWeight: 600 }}>Completa: {fullCount}</span>}
+              {quickCount > 0 && <span style={{ fontSize: 12, color: "#22C55E", background: "#F0FDF4", padding: "2px 8px", borderRadius: 6, fontWeight: 600 }}>Rápida: {quickCount}</span>}
+              {legacyCount > 0 && <span style={{ fontSize: 12, color: "#94A3B8", background: "#F8FAFC", padding: "2px 8px", borderRadius: 6, fontWeight: 600 }}>Legacy: {legacyCount}</span>}
+            </div>
+          ) : null
+        })()}
 
         <div style={card}>
           <p style={sectionTitle}>Respuestas por semana</p>

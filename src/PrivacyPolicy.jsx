@@ -2,15 +2,15 @@ export default function PrivacyPolicy({ onBack }) {
   const sections = [
     {
       title: "1. Responsable del tratamiento",
-      text: `El responsable del tratamiento de los datos personales recogidos a través de esta aplicación es el equipo investigador del estudio sobre calidad de vida en la menopausia, vinculado a la universidad correspondiente.\n\nContacto del responsable: [PENDIENTE DE DEFINIR]\nDelegado de Protección de Datos (DPO): [PENDIENTE — contacto del DPO de la universidad]`
+      text: `El responsable del tratamiento de los datos personales recogidos a través de esta aplicación es la Universidad Politécnica de Madrid (UPM), a través del equipo investigador del estudio sobre calidad de vida en la menopausia y actividad física.\n\nInvestigadora principal: Dra. Ana Belén Peinado\nContacto: anabelen.peinado@upm.es\nEncargado del tratamiento: Cuerpos Serranos S.L.\nDelegado de Protección de Datos (DPO): DPO de la Universidad Politécnica de Madrid`
     },
     {
       title: "2. Datos que se recogen",
-      text: `Se recogen exclusivamente los siguientes datos:\n\n• Edad (campo opcional)\n• Peso en kilogramos (campo opcional)\n• Respuestas a las 29 preguntas del cuestionario MENQOL (presencia de síntoma sí/no y puntuación 2-8)\n• Puntuaciones calculadas por dominio (vasomotor, psicosocial, físico, sexual) y global\n• Fecha y hora del envío\n\nNO se recoge: nombre, dirección de correo electrónico, dirección postal, número de teléfono, dirección IP, cookies de seguimiento, ni ningún otro dato que permita identificar directamente al participante.`
+      text: `Se recogen exclusivamente los siguientes datos:\n\n• Edad, peso y talla (campos opcionales)\n• Respuestas a las 29 preguntas del cuestionario MENQOL (presencia de síntoma sí/no y puntuación 0-6)\n• Datos sociodemográficos (estado civil, estudios, empleo, etnia) — solo versión completa\n• Hábitos (tabaco, alcohol) — solo versión completa\n• Antecedentes de salud — solo versión completa\n• Historia ginecológica o información sobre etapa reproductiva\n• Respuestas al cuestionario IPAQ (actividad física)\n• Puntuaciones calculadas por dominio y global\n• Fecha y hora del envío\n• Versión del cuestionario utilizada (completa/rápida)\n\nNO se recoge: nombre, dirección de correo electrónico, dirección postal, número de teléfono, dirección IP, cookies de seguimiento, ni ningún otro dato que permita identificar directamente al participante.`
     },
     {
       title: "3. Finalidad del tratamiento",
-      text: `Los datos se tratan con la finalidad exclusiva de:\n\n• Investigación científica sobre la calidad de vida relacionada con la menopausia\n• Análisis estadístico agregado de las respuestas al cuestionario MENQOL\n• Publicación de resultados en formato agregado y anonimizado en revistas científicas o comunicaciones académicas\n\nLos datos NO se utilizarán para fines comerciales, publicitarios ni para la elaboración de perfiles.`
+      text: `Los datos se tratan con la finalidad exclusiva de:\n\n• Investigación científica sobre la calidad de vida relacionada con la menopausia y su relación con la actividad física\n• Análisis estadístico agregado de las respuestas\n• Publicación de resultados en formato agregado y anonimizado en revistas científicas o comunicaciones académicas\n\nLos datos NO se utilizarán para fines comerciales, publicitarios ni para la elaboración de perfiles.`
     },
     {
       title: "4. Base legal del tratamiento",
@@ -18,7 +18,7 @@ export default function PrivacyPolicy({ onBack }) {
     },
     {
       title: "5. Destinatarios de los datos",
-      text: `Los datos son accesibles únicamente por:\n\n• Los investigadores autorizados del estudio, mediante credenciales de acceso protegidas\n\nNo se ceden datos a terceros. No se realizan decisiones automatizadas ni elaboración de perfiles con los datos recogidos.`
+      text: `Los datos son accesibles únicamente por:\n\n• Los investigadores autorizados del estudio (UPM y Cuerpos Serranos), mediante credenciales de acceso protegidas\n\nNo se ceden datos a terceros. No se realizan decisiones automatizadas ni elaboración de perfiles con los datos recogidos.`
     },
     {
       title: "6. Transferencias internacionales",
@@ -34,7 +34,7 @@ export default function PrivacyPolicy({ onBack }) {
     },
     {
       title: "9. Cómo ejercer tus derechos",
-      text: `Para ejercer cualquiera de los derechos mencionados:\n\n1. Envía un correo electrónico a: [PENDIENTE DE DEFINIR]\n2. Indica en el asunto: "Ejercicio de derechos RGPD — Estudio MENQOL"\n3. Incluye tu código de referencia (proporcionado al guardar tus respuestas)\n4. Especifica el derecho que deseas ejercer\n\nRecibirás respuesta en un plazo máximo de 30 días naturales.`
+      text: `Para ejercer cualquiera de los derechos mencionados:\n\n1. Envía un correo electrónico a: anabelen.peinado@upm.es\n2. Indica en el asunto: "Ejercicio de derechos RGPD — Estudio MENQOL"\n3. Incluye tu código de referencia (proporcionado al guardar tus respuestas)\n4. Especifica el derecho que deseas ejercer\n\nRecibirás respuesta en un plazo máximo de 30 días naturales.`
     },
     {
       title: "10. Medidas de seguridad",
@@ -46,7 +46,7 @@ export default function PrivacyPolicy({ onBack }) {
     },
     {
       title: "12. Modificaciones de esta política",
-      text: `Esta política de privacidad puede ser actualizada para reflejar cambios en el tratamiento de datos o en la normativa aplicable. La fecha de la última actualización se indica al final de este documento.\n\nÚltima actualización: febrero de 2026`
+      text: `Esta política de privacidad puede ser actualizada para reflejar cambios en el tratamiento de datos o en la normativa aplicable. La fecha de la última actualización se indica al final de este documento.\n\nÚltima actualización: marzo de 2026`
     },
   ]
 
@@ -72,7 +72,7 @@ export default function PrivacyPolicy({ onBack }) {
               Política de Privacidad
             </h1>
             <p style={{ fontSize: 13, color: "#94A3B8" }}>
-              Cuestionario MENQOL — Estudio de investigación
+              Cuestionario MENQOL — Estudio UPM / Cuerpos Serranos
             </p>
           </div>
 
@@ -102,7 +102,7 @@ export default function PrivacyPolicy({ onBack }) {
 
         <p style={{ fontSize: 11, color: "#94A3B8", textAlign: "center", lineHeight: 1.6 }}>
           Documento generado conforme al RGPD (UE 2016/679) y la LOPDGDD (LO 3/2018).
-          Para consultas: contactar al responsable del tratamiento indicado en la sección 1.
+          Para consultas: anabelen.peinado@upm.es
         </p>
       </div>
     </div>

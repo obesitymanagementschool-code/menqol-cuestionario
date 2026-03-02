@@ -35,19 +35,24 @@ export default function ConsentModal({ onAccept, onCancel, onOpenPrivacy }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
           {[
             {
+              icon: "🏛️",
+              title: "Responsable",
+              text: "Universidad Politécnica de Madrid (UPM). Investigadora principal: Dra. Ana Belén Peinado (anabelen.peinado@upm.es). Encargado del tratamiento: Cuerpos Serranos S.L."
+            },
+            {
               icon: "🎯",
               title: "Finalidad",
-              text: "Tus respuestas se usarán en un estudio de investigación sobre calidad de vida en la menopausia, vinculado a una universidad."
+              text: "Tus respuestas se usarán en un estudio de investigación sobre calidad de vida en la menopausia y actividad física, desarrollado por la UPM en colaboración con Cuerpos Serranos."
             },
             {
               icon: "📋",
               title: "Datos recogidos",
-              text: "Edad (opcional), peso (opcional) y tus 29 respuestas al cuestionario. No se recoge tu nombre, email, dirección IP ni ningún dato que te identifique."
+              text: "Edad, peso, talla, respuestas al cuestionario MENQOL, datos sociodemográficos y de actividad física (según versión). No se recoge tu nombre, email, dirección IP ni ningún dato que te identifique."
             },
             {
               icon: "🇪🇺",
               title: "Almacenamiento",
-              text: "Los datos se guardan en una base de datos cifrada ubicada en la Unión Europea (Supabase, región EU). La transmisión se realiza mediante HTTPS."
+              text: "Los datos se guardan cifrados en la Unión Europea (Supabase, región EU). La transmisión se realiza mediante HTTPS."
             },
             {
               icon: "🕐",
@@ -55,14 +60,9 @@ export default function ConsentModal({ onAccept, onCancel, onOpenPrivacy }) {
               text: "Los datos se conservarán durante la duración del estudio más 5 años adicionales, salvo que solicites su eliminación antes."
             },
             {
-              icon: "🔑",
-              title: "Acceso",
-              text: "Solo los investigadores autorizados del estudio pueden acceder a los datos, mediante credenciales protegidas."
-            },
-            {
               icon: "⚖️",
               title: "Tus derechos",
-              text: "Tienes derecho a solicitar el acceso, rectificación o eliminación de tus datos. Al guardar recibirás un código de referencia para ejercer estos derechos."
+              text: "Tienes derecho a solicitar el acceso, rectificación o eliminación de tus datos contactando a anabelen.peinado@upm.es. Al guardar recibirás un código de referencia para ejercer estos derechos."
             },
           ].map((item, i) => (
             <div key={i} style={{
@@ -78,6 +78,22 @@ export default function ConsentModal({ onAccept, onCancel, onOpenPrivacy }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Declarations */}
+        <div style={{
+          background: "#F8FAFC", borderRadius: 12, padding: 14,
+          border: "1px solid #E2E8F0", marginBottom: 16
+        }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 8 }}>Al aceptar, declaro que:</p>
+          <ul style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6, paddingLeft: 20, margin: 0 }}>
+            <li>He leído la información sobre el estudio y he podido hacer preguntas</li>
+            <li>Mi participación es voluntaria y puedo retirarme en cualquier momento</li>
+            <li>Comprendo que mis datos serán tratados de forma anónima</li>
+            <li>Autorizo el uso de mis respuestas con fines de investigación científica</li>
+            <li>Soy mayor de edad y cumplo con los criterios de participación (40-70 años)</li>
+            <li>He sido informada del tratamiento de mis datos conforme al RGPD</li>
+          </ul>
         </div>
 
         <button

@@ -1,3 +1,7 @@
+// MENQOL validated instrument — 29 items in original order (Hilditch et al., 1996)
+// Scale: 0-6 (0 = no me molesta, 6 = muchísimo)
+// Internal scoring: present ? rating + 2 : 1 → maps to MENQOL 1-8
+
 export const DOMAINS = [
   {
     id: "vasomotor",
@@ -10,8 +14,8 @@ export const DOMAINS = [
     items: [
       {
         id: 1,
-        label: "Sofocos",
-        help: "Sensaciones repentinas de calor intenso, generalmente en la parte superior del cuerpo, cara y cuello.",
+        label: "Sofocos o bochornos",
+        help: "Sensaciones repentinas de calor intenso, generalmente en la parte superior del cuerpo, cara y cuello. Pueden durar de unos segundos a varios minutos.",
         scale: {
           low: "Sofocos ocasionales y breves que no interrumpen tus actividades",
           mid: "Sofocos frecuentes que causan incomodidad y te obligan a pausar lo que haces",
@@ -21,7 +25,7 @@ export const DOMAINS = [
       {
         id: 2,
         label: "Sudores nocturnos",
-        help: "Episodios de sudoración excesiva durante la noche que pueden interrumpir el sueño.",
+        help: "Episodios de sudoración excesiva durante la noche que pueden interrumpir el sueño y obligarte a cambiar ropa de cama.",
         scale: {
           low: "Sudoración leve ocasional que no afecta mucho tu descanso",
           mid: "Te despiertas varias veces empapada, necesitas cambiar ropa o sábanas",
@@ -51,7 +55,17 @@ export const DOMAINS = [
     items: [
       {
         id: 4,
-        label: "Ansiedad o nerviosismo",
+        label: "Sentirse insatisfecha con su vida personal",
+        help: "Sensación de no estar contenta con tu vida actual, falta de plenitud o de sentido en el día a día.",
+        scale: {
+          low: "Momentos puntuales de insatisfacción que pasan relativamente rápido",
+          mid: "Sensación frecuente de estancamiento o falta de propósito",
+          high: "Insatisfacción profunda y constante con tu vida personal"
+        }
+      },
+      {
+        id: 5,
+        label: "Sentirse ansiosa o nerviosa",
         help: "Sensación de inquietud, preocupación excesiva o tensión sin causa aparente.",
         scale: {
           low: "Momentos puntuales de nerviosismo que puedes manejar",
@@ -60,48 +74,8 @@ export const DOMAINS = [
         }
       },
       {
-        id: 5,
-        label: "Sentimientos de tristeza o depresión",
-        help: "Sensación persistente de desánimo, tristeza o falta de interés en actividades que antes disfrutabas.",
-        scale: {
-          low: "Días puntuales de bajón anímico que pasan relativamente rápido",
-          mid: "Tristeza frecuente que afecta tu motivación y relaciones",
-          high: "Tristeza profunda y persistente que te impide funcionar con normalidad"
-        }
-      },
-      {
         id: 6,
-        label: "Impaciencia con los demás",
-        help: "Mayor irritabilidad, menor tolerancia y reacciones desproporcionadas ante situaciones cotidianas.",
-        scale: {
-          low: "Algo más irritable de lo habitual pero lo controlas",
-          mid: "Irritabilidad frecuente que afecta tus relaciones personales",
-          high: "Reacciones intensas y constantes que generan conflictos importantes"
-        }
-      },
-      {
-        id: 7,
-        label: "Necesidad de estar sola",
-        help: "Deseo de aislarte, evitar compromisos sociales o sentir que necesitas más tiempo a solas del habitual.",
-        scale: {
-          low: "Prefieres más tiempo a solas que antes pero mantienes tu vida social",
-          mid: "Evitas activamente compromisos sociales con frecuencia",
-          high: "Aislamiento marcado que afecta tus relaciones y responsabilidades"
-        }
-      },
-      {
-        id: 8,
-        label: "Dificultad de concentración",
-        help: "Problemas para mantener la atención, completar tareas o seguir conversaciones.",
-        scale: {
-          low: "Te distraes algo más fácilmente pero puedes completar tus tareas",
-          mid: "Dificultad notable que afecta tu rendimiento laboral o personal",
-          high: "Incapacidad frecuente para concentrarte en tareas básicas"
-        }
-      },
-      {
-        id: 9,
-        label: "Problemas de memoria",
+        label: "Tener mala memoria",
         help: "Olvidos frecuentes, dificultad para recordar nombres, palabras o dónde dejaste las cosas (niebla mental).",
         scale: {
           low: "Olvidos ocasionales menores que no afectan tu día a día",
@@ -110,13 +84,43 @@ export const DOMAINS = [
         }
       },
       {
-        id: 10,
-        label: "Sensación de falta de realización personal",
-        help: "Sentir que no logras lo que te propones, insatisfacción con tu vida actual o pérdida de propósito.",
+        id: 7,
+        label: "Lograr hacer menos cosas de las que solía hacer",
+        help: "Sensación de que tu capacidad para completar tareas ha disminuido respecto a antes.",
         scale: {
-          low: "Momentos puntuales de insatisfacción con tus logros",
-          mid: "Sensación frecuente de estancamiento o falta de propósito",
-          high: "Insatisfacción profunda y constante con tu vida personal"
+          low: "Rindes algo menos que antes pero cumples con lo importante",
+          mid: "Notas una reducción clara de tu productividad y capacidad",
+          high: "Tu rendimiento ha caído drásticamente comparado con antes"
+        }
+      },
+      {
+        id: 8,
+        label: "Sentirse deprimida, desanimada o triste",
+        help: "Sensación persistente de desánimo, tristeza o falta de interés en actividades que antes disfrutabas.",
+        scale: {
+          low: "Días puntuales de bajón anímico que pasan relativamente rápido",
+          mid: "Tristeza frecuente que afecta tu motivación y relaciones",
+          high: "Tristeza profunda y persistente que te impide funcionar con normalidad"
+        }
+      },
+      {
+        id: 9,
+        label: "Ser impaciente con los demás",
+        help: "Mayor irritabilidad, menor tolerancia y reacciones desproporcionadas ante situaciones cotidianas.",
+        scale: {
+          low: "Algo más irritable de lo habitual pero lo controlas",
+          mid: "Irritabilidad frecuente que afecta tus relaciones personales",
+          high: "Reacciones intensas y constantes que generan conflictos importantes"
+        }
+      },
+      {
+        id: 10,
+        label: "Deseos de estar sola",
+        help: "Deseo de aislarte, evitar compromisos sociales o sentir que necesitas más tiempo a solas del habitual.",
+        scale: {
+          low: "Prefieres más tiempo a solas que antes pero mantienes tu vida social",
+          mid: "Evitas activamente compromisos sociales con frecuencia",
+          high: "Aislamiento marcado que afecta tus relaciones y responsabilidades"
         }
       }
     ]
@@ -142,22 +146,22 @@ export const DOMAINS = [
       },
       {
         id: 12,
-        label: "Hinchazón abdominal",
-        help: "Sensación de abdomen distendido, pesadez o retención de líquidos.",
-        scale: {
-          low: "Hinchazón ocasional que no afecta tu comodidad",
-          mid: "Hinchazón frecuente que te obliga a adaptar tu ropa",
-          high: "Hinchazón constante y molesta que afecta tu imagen y comodidad"
-        }
-      },
-      {
-        id: 13,
-        label: "Dolor muscular y articular",
-        help: "Dolores en músculos y articulaciones, rigidez o molestias al moverte.",
+        label: "Dolor en músculos y articulaciones",
+        help: "Dolores en músculos y articulaciones, rigidez matutina o molestias al moverte.",
         scale: {
           low: "Molestias leves que no limitan tu actividad",
           mid: "Dolor frecuente que dificulta algunas actividades",
           high: "Dolor intenso y constante que limita seriamente tu movilidad"
+        }
+      },
+      {
+        id: 13,
+        label: "Sentirse cansada o agotada",
+        help: "Sensación de agotamiento, falta de energía o necesidad de descansar más de lo habitual.",
+        scale: {
+          low: "Algo más cansada de lo habitual pero funcional",
+          mid: "Fatiga frecuente que reduce tu productividad",
+          high: "Agotamiento extremo que te impide realizar actividades básicas"
         }
       },
       {
@@ -172,18 +176,18 @@ export const DOMAINS = [
       },
       {
         id: 15,
-        label: "Cansancio o fatiga",
-        help: "Sensación de agotamiento, falta de energía o necesidad de descansar más de lo habitual.",
+        label: "Dolores de cabeza",
+        help: "Cefaleas nuevas o más frecuentes/intensas que antes de la menopausia.",
         scale: {
-          low: "Algo más cansada de lo habitual pero funcional",
-          mid: "Fatiga frecuente que reduce tu productividad",
-          high: "Agotamiento extremo que te impide realizar actividades básicas"
+          low: "Dolores de cabeza ocasionales y manejables",
+          mid: "Dolores frecuentes que requieren medicación",
+          high: "Dolores intensos y frecuentes que te incapacitan"
         }
       },
       {
         id: 16,
-        label: "Dolor de espalda",
-        help: "Molestias en la zona lumbar, dorsal o cervical, que pueden ser nuevas o haberse intensificado.",
+        label: "Dolor de espalda, cuello u hombros",
+        help: "Molestias en la zona lumbar, dorsal, cervical u hombros, que pueden ser nuevas o haberse intensificado.",
         scale: {
           low: "Molestias leves y ocasionales",
           mid: "Dolor frecuente que limita ciertas posturas o actividades",
@@ -202,8 +206,8 @@ export const DOMAINS = [
       },
       {
         id: 18,
-        label: "Incontinencia urinaria",
-        help: "Pérdidas involuntarias de orina al reír, toser, estornudar o hacer esfuerzo.",
+        label: "Incontinencia urinaria al reír, toser o estornudar",
+        help: "Pérdidas involuntarias de orina al reír, toser, estornudar o hacer esfuerzo físico.",
         scale: {
           low: "Pérdidas muy pequeñas y ocasionales",
           mid: "Pérdidas frecuentes que requieren protección",
@@ -212,16 +216,26 @@ export const DOMAINS = [
       },
       {
         id: 19,
-        label: "Piel seca",
-        help: "Sequedad, descamación o pérdida de elasticidad en la piel del cuerpo o rostro.",
+        label: "Hinchazón abdominal",
+        help: "Sensación de abdomen distendido, pesadez o retención de líquidos en la zona abdominal.",
         scale: {
-          low: "Sequedad leve que se maneja con hidratación habitual",
-          mid: "Sequedad notable que requiere cuidados especiales",
-          high: "Piel muy seca con picor, grietas o molestias constantes"
+          low: "Hinchazón ocasional que no afecta tu comodidad",
+          mid: "Hinchazón frecuente que te obliga a adaptar tu ropa",
+          high: "Hinchazón constante y molesta que afecta tu imagen y comodidad"
         }
       },
       {
         id: 20,
+        label: "Dolor lumbar",
+        help: "Dolor en la parte baja de la espalda, que puede ser constante o aparecer con ciertos movimientos.",
+        scale: {
+          low: "Molestias leves que no limitan tu actividad",
+          mid: "Dolor frecuente que dificulta agacharte o estar de pie",
+          high: "Dolor intenso que limita seriamente tu movilidad diaria"
+        }
+      },
+      {
+        id: 21,
         label: "Aumento de peso",
         help: "Ganancia de peso no intencionada o dificultad para mantener tu peso habitual.",
         scale: {
@@ -231,7 +245,7 @@ export const DOMAINS = [
         }
       },
       {
-        id: 21,
+        id: 22,
         label: "Aumento del vello facial",
         help: "Aparición o aumento de vello en zonas como labio superior, mentón o mejillas.",
         scale: {
@@ -241,9 +255,9 @@ export const DOMAINS = [
         }
       },
       {
-        id: 22,
-        label: "Cambios en la piel (manchas, arrugas)",
-        help: "Aparición de manchas, arrugas más pronunciadas o cambios en la textura de la piel.",
+        id: 23,
+        label: "Cambios en la piel (sequedad, manchas, arrugas)",
+        help: "Sequedad, descamación, aparición de manchas, arrugas más pronunciadas o cambios en la textura de la piel.",
         scale: {
           low: "Cambios leves que notas pero no te preocupan",
           mid: "Cambios visibles que afectan tu autoestima",
@@ -251,9 +265,9 @@ export const DOMAINS = [
         }
       },
       {
-        id: 23,
+        id: 24,
         label: "Sensación de hinchazón en extremidades",
-        help: "Piernas, tobillos o manos hinchados, sensación de pesadez o retención.",
+        help: "Piernas, tobillos o manos hinchados, sensación de pesadez o retención de líquidos.",
         scale: {
           low: "Hinchazón leve al final del día que mejora con reposo",
           mid: "Hinchazón frecuente que causa incomodidad",
@@ -261,19 +275,9 @@ export const DOMAINS = [
         }
       },
       {
-        id: 24,
-        label: "Dolores de cabeza",
-        help: "Cefaleas nuevas o más frecuentes/intensas que antes de la menopausia.",
-        scale: {
-          low: "Dolores de cabeza ocasionales y manejables",
-          mid: "Dolores frecuentes que requieren medicación",
-          high: "Dolores intensos y frecuentes que te incapacitan"
-        }
-      },
-      {
         id: 25,
         label: "Falta de energía",
-        help: "Sensación de agotamiento vital, pérdida de vitalidad o desgana general.",
+        help: "Sensación de agotamiento vital, pérdida de vitalidad o desgana general diferente del cansancio puntual.",
         scale: {
           low: "Menos energía que antes pero sigues activa",
           mid: "Energía baja que afecta tu productividad y actividades",
