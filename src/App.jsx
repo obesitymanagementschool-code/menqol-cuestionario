@@ -69,30 +69,44 @@ const FULL_SECTIONS = [
 /* ─── Dual Logo Header ─── */
 function StudyHeader() {
   return (
-    <div style={{
-      padding: "14px 20px 12px",
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      borderBottom: "1px solid #F1F5F9",
-      background: "white",
-      position: "sticky", top: 0, zIndex: 100,
-      boxShadow: "0 1px 8px rgba(0,0,0,0.05)"
-    }}>
-      <img
-        src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/sites/2147510088/images/f458131-d2d-8f88-6ce4-c88226fad1_a8806550-fce2-46b2-8942-432d3bddd28d.png"
-        alt="Cuerpos Serranos S.L."
-        style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
-      />
+    <div style={{ position: "sticky", top: 0, zIndex: 100 }}>
+      {/* Banner rojo superior */}
       <div style={{
-        fontSize: 10, color: "#CBD5E1", fontWeight: 600, letterSpacing: "0.05em",
-        textAlign: "center", textTransform: "uppercase"
+        background: "#dd2946",
+        padding: "10px 20px 8px",
+        textAlign: "center"
       }}>
-        Estudio Mujeres de Hierro
+        <p style={{
+          fontSize: 18, fontWeight: 800, color: "white",
+          letterSpacing: "0.05em", textTransform: "uppercase", lineHeight: 1.2
+        }}>
+          Mujeres de Hierro
+        </p>
+        <img
+          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/5be8a16-d160-325c-ce5-2d88f8128c05_De_disen_o.png"
+          alt="estrella"
+          style={{ height: 18, objectFit: "contain", marginTop: 4, display: "block", margin: "4px auto 0" }}
+        />
       </div>
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Logo_Universidad_Polit%C3%A9cnica_de_Madrid.svg/3840px-Logo_Universidad_Polit%C3%A9cnica_de_Madrid.svg.png"
-        alt="Universidad Politécnica de Madrid"
-        style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
-      />
+      {/* Barra de logos */}
+      <div style={{
+        padding: "10px 20px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        borderBottom: "1px solid #F1F5F9",
+        background: "white",
+        boxShadow: "0 1px 8px rgba(0,0,0,0.05)"
+      }}>
+        <img
+          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/2cadeb1-21fd-ae7-eb65-206a4b3856c_f458131-d2d-8f88-6ce4-c88226fad1_a8806550-fce2-46b2-8942-432d3bddd28d.png"
+          alt="Cuerpos Serranos S.L."
+          style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
+        />
+        <img
+          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/d5a31d5-7707-1a42-1642-dfda8f14c2da_Logo_Universidad_Polite_cnica_de_Madrid.svg.png"
+          alt="Universidad Politécnica de Madrid"
+          style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
+        />
+      </div>
     </div>
   )
 }
@@ -1017,7 +1031,7 @@ export default function App() {
                 Mujeres de hierro
               </h2>
               <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.7, textAlign: "center", marginBottom: 20 }}>
-                Estudio de investigación de la <strong>Universidad Politécnica de Madrid (UPM)</strong> en colaboración con <strong>Cuerpos Serranos</strong>. Evalúa tu calidad de vida, actividad física y factores de salud asociados a la menopausia.
+                Estudio de investigación de <strong>Cuerpos Serranos</strong> junto a la <strong>Universidad Politécnica de Madrid (UPM)</strong>. Evalúa tu calidad de vida, actividad física y factores de salud asociados a la menopausia.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
                 {[
