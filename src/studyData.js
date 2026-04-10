@@ -145,12 +145,7 @@ export const SECTION_HABITS = {
       id: "smokingAmount",
       type: "select",
       label: "Indique cuántos cigarrillos al día",
-      options: [
-        { value: "1-5", label: "1-5 cigarrillos/día" },
-        { value: "6-10", label: "6-10 cigarrillos/día" },
-        { value: "11-20", label: "11-20 cigarrillos/día" },
-        { value: "21+", label: "Más de 20 cigarrillos/día" }
-      ],
+      options: Array.from({ length: 100 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "cigarrillo" : "cigarrillos"}` })),
       condition: { field: "smoking", equal: "current" },
       help: "Número aproximado de cigarrillos al día."
     },
@@ -411,9 +406,7 @@ export const SECTION_GYNECOLOGY = {
         { value: "3-6months", label: "Hace 3-6 meses" },
         { value: "6-12months", label: "Hace 6-12 meses" },
         { value: "1-5years", label: "Hace 1-5 años" },
-        { value: "5+years", label: "Hace más de 5 años" },
-        { value: "surgical", label: "No tengo reglas por cirugía/tratamiento" },
-        { value: "unknown", label: "No lo recuerdo" }
+        { value: "5+years", label: "Hace más de 5 años" }
       ],
       help: "Seleccione la opción que mejor corresponda."
     },
