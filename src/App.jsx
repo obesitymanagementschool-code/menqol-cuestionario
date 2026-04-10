@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { DOMAINS } from './data.js'
-// La conexión  a Supabase se hace server-side en la Edge Function
+// La conexión a Supabase se hace server-side en la Edge Function
 // El frontend solo llama a la función — nunca escribe directamente en la BD
 const EDGE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL
   ?? 'https://TU_PROJECT_ID.supabase.co/functions/v1/submit-response'
@@ -62,7 +62,7 @@ const FULL_SECTIONS = [
   { ...SECTION_HEALTH, shortName: "Salud" },
   { ...SECTION_GYNECOLOGY, shortName: "Gineco." },
   { id: "menqol", name: "MENQOL", shortName: "MENQOL", emoji: "🌸", description: "Cuestionario de calidad de vida en la menopausia (29 preguntas)", estimatedMinutes: 7 },
-  { id: "ipaqLong", name: "Actividad física", shortName: "IPAQ", emoji: "🏃‍♀️", description: "Cuestionario IPAQ largo (actividad en los últimos 7 días)", estimatedMinutes: 5 },
+  { id: "ipaqLong", name: "Actividad física", shortName: "IPAQ", emoji: "🏃‍♀️", description: "Cuestionario IPAQ (actividad en los últimos 7 días)", estimatedMinutes: 5 },
   { id: "results", name: "Resultados", shortName: "Resultado", emoji: "📊", description: "Tu informe personalizado", estimatedMinutes: 0 },
 ]
 
@@ -594,6 +594,7 @@ function RadarChart({ domainResults, refPcts, ageGroup }) {
 /* ─── Results View ─── */
 function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPrivacy, timestamps, projectCode }) {
   const [saveStatus, setSaveStatus] = useState(null)
+  const hasSaved = useRef(false)
 
   const domainResults = DOMAINS.map(domain => {
     const items = domain.items
@@ -627,6 +628,14 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
 
   const gynData = studyData.gynecology || {}
   const reproStage = classifyReproductiveStage(gynData)
+
+  // Auto-save on mount (once only)
+  useEffect(() => {
+    if (!hasSaved.current) {
+      hasSaved.current = true
+      handleSave()
+    }
+  }, [])
 
   const handleSave = async () => {
     setSaveStatus("saving")
@@ -710,31 +719,42 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
         })}
       </div>
 
-      {/* Save button */}
-      {saveStatus !== "saved" && (
-        <button
-          onClick={handleSave}
-          disabled={saveStatus === "saving"}
-          style={{
-            width: "100%", padding: 16, borderRadius: 14,
-            background: saveStatus === "saving" ? "#94A3B8" : "#dd2946",
-            color: "white", border: "none", fontSize: 15, fontWeight: 700,
-            cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
-            boxShadow: "0 4px 15px rgba(221,41,70,0.35)", marginBottom: 12
-          }}
-        >
-          {saveStatus === "saving" ? "Guardando..." : saveStatus === "error" ? "Error — Intentar de nuevo" : "Guardar y enviar mis respuestas"}
-        </button>
+      {/* Auto-save status */}
+      {saveStatus === "saving" && (
+        <div style={{
+          background: "#FFF5F7", borderRadius: 14, padding: 16, marginBottom: 12,
+          border: "2px solid #dd294640", textAlign: "center"
+        }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#dd2946" }}>Guardando tus respuestas...</p>
+        </div>
       )}
       {saveStatus === "saved" && (
         <div style={{
           background: "#F0FDF4", borderRadius: 14, padding: 16, marginBottom: 12,
           border: "2px solid #22C55E40", textAlign: "center"
         }}>
-          <p style={{ fontSize: 15, fontWeight: 700, color: "#16A34A" }}>✓ Respuestas guardadas</p>
-          <p style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>Código: <strong>{projectCode}</strong></p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#16A34A" }}>✓ Respuestas guardadas correctamente</p>
+          <p style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>Código de participante: <strong>{projectCode}</strong></p>
         </div>
       )}
+      {saveStatus === "error" && (
+        <div style={{
+          background: "#FEF2F2", borderRadius: 14, padding: 16, marginBottom: 12,
+          border: "2px solid #EF444440", textAlign: "center"
+        }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#EF4444" }}>Error al guardar</p>
+          <p style={{ fontSize: 13, color: "#64748B", marginTop: 4 }}>Por favor contacta con el equipo investigador: info@cuerposserranos.com</p>
+        </div>
+      )}
+      {/* PDF download button */}
+      <button onClick={() => window.print()} style={{
+        width: "100%", padding: 16, borderRadius: 14,
+        background: "white", color: "#dd2946",
+        border: "2px solid #dd2946",
+        fontSize: 15, fontWeight: 700, cursor: "pointer", marginBottom: 12
+      }}>
+        Descargar informe en PDF
+      </button>
 
       <button onClick={onReset} style={{
         width: "100%", padding: 14, borderRadius: 14,
@@ -1031,7 +1051,7 @@ export default function App() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
                 {[
                   { emoji: "🌸", label: "MENQOL", sub: "29 síntomas", bg: "#FFF1F2", color: "#E8927C" },
-                  { emoji: "🏃‍♀️", label: "Actividad física", sub: "IPAQ largo", bg: "#F0FDF4", color: "#22C55E" },
+                  { emoji: "🏃‍♀️", label: "Actividad física", sub: "IPAQ", bg: "#F0FDF4", color: "#22C55E" },
                   { emoji: "🩺", label: "Salud y hábitos", sub: "Antecedentes", bg: "#EEF2FF", color: "#7C9CE8" },
                   { emoji: "👩‍⚕️", label: "Ginecología", sub: "Etapa reproductiva", bg: "#FDF4FF", color: "#9C7CE8" },
                 ].map(d => (
@@ -1101,9 +1121,6 @@ export default function App() {
           <>
             <SectionStepper sections={sections} currentIndex={currentSection} />
 
-            <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-              <TimeEstimate sections={sections} currentIndex={currentSection} />
-            </div>
 
             {section.id === "menqol" ? (
               <MenqolSectionView
@@ -1152,7 +1169,7 @@ export default function App() {
                     flex: 1, padding: 14, borderRadius: 14,
                     background: "white", color: "#64748B", border: "1.5px solid #E2E8F0",
                     fontSize: 15, fontWeight: 600, cursor: "pointer"
-                  }}>Anterior</button>
+                  }}>← Anterior</button>
                 )}
                 <button
                   onClick={goNext}
@@ -1165,7 +1182,7 @@ export default function App() {
                     boxShadow: canProceed() ? "0 4px 15px rgba(221,41,70,0.35)" : "none",
                     transition: "all 0.2s"
                   }}
-                >{currentSection < sections.length - 2 ? "Siguiente" : "Ver resultados"}</button>
+                >{currentSection < sections.length - 2 ? "Siguiente →" : "Finalizar y ver resultados →"}</button>
               </div>
             )}
           </>
