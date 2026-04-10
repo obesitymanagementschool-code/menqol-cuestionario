@@ -2,7 +2,7 @@
 
 Cuestionario interactivo de **Calidad de Vida Específica de la Menopausia** (MENQOL) — una herramienta web para evaluar el impacto de los síntomas menopáusicos en la calidad de vida.
 
-## ✨ Características
+## ✨ Características 
 
 - **29 preguntas** organizadas en 4 dominios: Vasomotor, Psicosocial, Físico y Sexual
 - **Diseño mobile-first** optimizado para uso en smartphones
