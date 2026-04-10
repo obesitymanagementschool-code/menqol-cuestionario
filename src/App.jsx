@@ -69,42 +69,37 @@ const FULL_SECTIONS = [
 /* ─── Dual Logo Header ─── */
 function StudyHeader() {
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 100 }}>
-      {/* Banner rojo superior */}
+    <div style={{ position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
       <div style={{
         background: "#dd2946",
-        padding: "10px 20px 8px",
-        textAlign: "center"
+        padding: "10px 20px 12px",
+        display: "flex", alignItems: "center", justifyContent: "space-between"
       }}>
-        <p style={{
-          fontSize: 18, fontWeight: 800, color: "white",
-          letterSpacing: "0.05em", textTransform: "uppercase", lineHeight: 1.2
-        }}>
-          Mujeres de Hierro
-        </p>
+        {/* Logo Cuerpos Serranos izquierda */}
         <img
-          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/5be8a16-d160-325c-ce5-2d88f8128c05_De_disen_o.png"
-          alt="estrella"
-          style={{ height: 18, objectFit: "contain", marginTop: 4, display: "block", margin: "4px auto 0" }}
-        />
-      </div>
-      {/* Barra de logos */}
-      <div style={{
-        padding: "10px 20px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: "1px solid #F1F5F9",
-        background: "white",
-        boxShadow: "0 1px 8px rgba(0,0,0,0.05)"
-      }}>
-        <img
-          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/2cadeb1-21fd-ae7-eb65-206a4b3856c_f458131-d2d-8f88-6ce4-c88226fad1_a8806550-fce2-46b2-8942-432d3bddd28d.png"
+          src="/menqol-cuestionario/logo-cuerpos-serranos.png"
           alt="Cuerpos Serranos S.L."
-          style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
+          style={{ height: 30, objectFit: "contain", maxWidth: 110 }}
         />
+        {/* Centro: título + estrella */}
+        <div style={{ textAlign: "center", flex: 1, padding: "0 10px" }}>
+          <p style={{
+            fontSize: 13, fontWeight: 800, color: "white",
+            letterSpacing: "0.06em", textTransform: "uppercase", lineHeight: 1.2
+          }}>
+            Estudio Mujeres de Hierro
+          </p>
+          <img
+            src="/menqol-cuestionario/estrella.png"
+            alt="estrella"
+            style={{ height: 14, objectFit: "contain", marginTop: 3, display: "block", margin: "3px auto 0" }}
+          />
+        </div>
+        {/* Logo UPM derecha */}
         <img
-          src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2148370963/settings_images/d5a31d5-7707-1a42-1642-dfda8f14c2da_Logo_Universidad_Polite_cnica_de_Madrid.svg.png"
+          src="/menqol-cuestionario/logo-upm.png"
           alt="Universidad Politécnica de Madrid"
-          style={{ height: 32, objectFit: "contain", maxWidth: 130 }}
+          style={{ height: 30, objectFit: "contain", maxWidth: 110 }}
         />
       </div>
     </div>
@@ -123,7 +118,7 @@ function InfoSheetScreen({ onAccept }) {
         overflow: "hidden"
       }}>
         {/* Title block */}
-        <div style={{ background: "linear-gradient(135deg, #1E293B 0%, #334155 100%)", padding: "24px 20px" }}>
+        <div style={{ background: "linear-gradient(135deg, #dd2946 0%, #b01e35 100%)", padding: "24px 20px" }}>
           <p style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
             Hoja de información al participante
           </p>
@@ -227,15 +222,15 @@ function InfoSheetScreen({ onAccept }) {
             onClick={() => setChecked(c => !c)}
             style={{
               marginTop: 24, padding: 16, borderRadius: 12, cursor: "pointer",
-              border: checked ? "2px solid #1E293B" : "2px solid #E2E8F0",
-              background: checked ? "#F8FAFC" : "white",
+              border: checked ? "2px solid #dd2946" : "2px solid #E2E8F0",
+              background: checked ? "#FFF5F7" : "white",
               display: "flex", alignItems: "flex-start", gap: 12,
               transition: "all 0.2s"
             }}
           >
             <div style={{
-              width: 22, height: 22, borderRadius: 6, border: "2px solid #1E293B",
-              background: checked ? "#1E293B" : "white",
+              width: 22, height: 22, borderRadius: 6, border: "2px solid #dd2946",
+              background: checked ? "#dd2946" : "white",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0, marginTop: 1, transition: "background 0.15s"
             }}>
@@ -252,10 +247,10 @@ function InfoSheetScreen({ onAccept }) {
             style={{
               marginTop: 16, width: "100%", padding: 16,
               borderRadius: 14, border: "none",
-              background: checked ? "#1E293B" : "#CBD5E1",
+              background: checked ? "#dd2946" : "#CBD5E1",
               color: "white", fontSize: 15, fontWeight: 700,
               cursor: checked ? "pointer" : "not-allowed",
-              boxShadow: checked ? "0 4px 15px rgba(30,41,59,0.3)" : "none",
+              boxShadow: checked ? "0 4px 15px rgba(221,41,70,0.35)" : "none",
               transition: "all 0.2s"
             }}
           >
@@ -304,7 +299,7 @@ function ConsentScreen({ onAccept }) {
         border: "1.5px solid #F1F5F9", boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
         overflow: "hidden"
       }}>
-        <div style={{ background: "linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)", padding: "24px 20px" }}>
+        <div style={{ background: "linear-gradient(135deg, #dd2946 0%, #b01e35 100%)", padding: "24px 20px" }}>
           <p style={{ fontSize: 11, color: "#DDD6FE", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
             Consentimiento informado
           </p>
@@ -345,15 +340,15 @@ function ConsentScreen({ onAccept }) {
             onClick={() => setChecked1(c => !c)}
             style={{
               marginTop: 24, padding: 16, borderRadius: 12, cursor: "pointer",
-              border: checked1 ? "2px solid #7C3AED" : "2px solid #E2E8F0",
-              background: checked1 ? "#FAF5FF" : "white",
+              border: checked1 ? "2px solid #dd2946" : "2px solid #E2E8F0",
+              background: checked1 ? "#FFF5F7" : "white",
               display: "flex", alignItems: "flex-start", gap: 12,
               transition: "all 0.2s"
             }}
           >
             <div style={{
-              width: 22, height: 22, borderRadius: 6, border: "2px solid #7C3AED",
-              background: checked1 ? "#7C3AED" : "white",
+              width: 22, height: 22, borderRadius: 6, border: "2px solid #dd2946",
+              background: checked1 ? "#dd2946" : "white",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0, marginTop: 1, transition: "background 0.15s"
             }}>
@@ -369,15 +364,15 @@ function ConsentScreen({ onAccept }) {
             onClick={() => setChecked2(c => !c)}
             style={{
               marginTop: 12, padding: 16, borderRadius: 12, cursor: "pointer",
-              border: checked2 ? "2px solid #7C3AED" : "2px solid #E2E8F0",
-              background: checked2 ? "#FAF5FF" : "white",
+              border: checked2 ? "2px solid #dd2946" : "2px solid #E2E8F0",
+              background: checked2 ? "#FFF5F7" : "white",
               display: "flex", alignItems: "flex-start", gap: 12,
               transition: "all 0.2s"
             }}
           >
             <div style={{
-              width: 22, height: 22, borderRadius: 6, border: "2px solid #7C3AED",
-              background: checked2 ? "#7C3AED" : "white",
+              width: 22, height: 22, borderRadius: 6, border: "2px solid #dd2946",
+              background: checked2 ? "#dd2946" : "white",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0, marginTop: 1, transition: "background 0.15s"
             }}>
@@ -394,10 +389,10 @@ function ConsentScreen({ onAccept }) {
             style={{
               marginTop: 16, width: "100%", padding: 16,
               borderRadius: 14, border: "none",
-              background: canProceed ? "#7C3AED" : "#CBD5E1",
+              background: canProceed ? "#dd2946" : "#CBD5E1",
               color: "white", fontSize: 15, fontWeight: 700,
               cursor: canProceed ? "pointer" : "not-allowed",
-              boxShadow: canProceed ? "0 4px 15px rgba(124,58,237,0.35)" : "none",
+              boxShadow: canProceed ? "0 4px 15px rgba(221,41,70,0.35)" : "none",
               transition: "all 0.2s"
             }}
           >
@@ -451,7 +446,7 @@ function InfoSheet({ item, onClose }) {
           ))}
         </div>
         <button onClick={onClose} style={{
-          marginTop: 16, width: "100%", padding: 12, background: "#1E293B",
+          marginTop: 16, width: "100%", padding: 12, background: "#dd2946",
           color: "white", border: "none", borderRadius: 12, fontSize: 15,
           fontWeight: 600, cursor: "pointer"
         }}>Entendido</button>
@@ -722,10 +717,10 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
           disabled={saveStatus === "saving"}
           style={{
             width: "100%", padding: 16, borderRadius: 14,
-            background: saveStatus === "saving" ? "#94A3B8" : "#1E293B",
+            background: saveStatus === "saving" ? "#94A3B8" : "#dd2946",
             color: "white", border: "none", fontSize: 15, fontWeight: 700,
             cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
-            boxShadow: "0 4px 15px rgba(30,41,59,0.3)", marginBottom: 12
+            boxShadow: "0 4px 15px rgba(221,41,70,0.35)", marginBottom: 12
           }}
         >
           {saveStatus === "saving" ? "Guardando..." : saveStatus === "error" ? "Error — Intentar de nuevo" : "Guardar y enviar mis respuestas"}
@@ -1026,7 +1021,7 @@ export default function App() {
               border: "1.5px solid #F1F5F9", marginBottom: 16,
               boxShadow: "0 4px 20px rgba(0,0,0,0.04)"
             }}>
-              <div style={{ fontSize: 48, textAlign: "center", marginBottom: 16 }}>🌸</div>
+              <div style={{ textAlign: "center", marginBottom: 16 }}><img src="/menqol-cuestionario/estrella.png" alt="estrella" style={{ height: 60, objectFit: "contain" }} /></div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1E293B", textAlign: "center", marginBottom: 12, lineHeight: 1.3 }}>
                 Mujeres de hierro
               </h2>
@@ -1062,9 +1057,9 @@ export default function App() {
 
             <button onClick={() => setStep("infoSheet")} style={{
               width: "100%", padding: 16, borderRadius: 14,
-              background: "#1E293B", color: "white", border: "none",
+              background: "#dd2946", color: "white", border: "none",
               fontSize: 16, fontWeight: 700, cursor: "pointer",
-              boxShadow: "0 4px 15px rgba(30,41,59,0.3)"
+              boxShadow: "0 4px 15px rgba(221,41,70,0.35)"
             }}>Leer información del estudio →</button>
 
             <button onClick={() => setStep("dashboard")} style={{
@@ -1164,10 +1159,10 @@ export default function App() {
                   disabled={!canProceed()}
                   style={{
                     flex: 2, padding: 14, borderRadius: 14,
-                    background: canProceed() ? "#1E293B" : "#CBD5E1",
+                    background: canProceed() ? "#dd2946" : "#CBD5E1",
                     color: "white", border: "none", fontSize: 15, fontWeight: 700,
                     cursor: canProceed() ? "pointer" : "not-allowed",
-                    boxShadow: canProceed() ? "0 4px 15px rgba(30,41,59,0.3)" : "none",
+                    boxShadow: canProceed() ? "0 4px 15px rgba(221,41,70,0.35)" : "none",
                     transition: "all 0.2s"
                   }}
                 >{currentSection < sections.length - 2 ? "Siguiente" : "Ver resultados"}</button>
