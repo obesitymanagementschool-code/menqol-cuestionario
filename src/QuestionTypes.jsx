@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 /* ─── Help Bottom Sheet (kept for MENQOL tooltips) ─── */
 export function HelpSheet({ title, text, onClose }) {
@@ -235,38 +235,23 @@ export function CheckboxQuestion({ question, value, onChange }) {
 
 /* ─── Wheel Picker (ruleta numérica) ─── */
 export function WheelPicker({ question, value, onChange }) {
-  const { useState, useRef, useEffect, useCallback } = require !== undefined
-    ? { useState: null } : {}
-
   const min = question.min ?? 0
   const max = question.max ?? 100
   const step = question.step ?? 1
   const unit = question.unit ?? ""
   const defaultVal = question.defaultValue ?? Math.round((min + max) / 2)
+  const ITEM_HEIGHT = 44
 
-  const [current, setCurrent] = React.useState(value != null ? Number(value) : null)
-  const [isDragging, setIsDragging] = React.useState(false)
-  const [startY, setStartY] = React.useState(0)
-  const [startVal, setStartVal] = React.useState(defaultVal)
-  const containerRef = React.useRef(null)
+  const [current, setCurrent] = useState(value != null ? Number(value) : null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startY, setStartY] = useState(0)
+  const [startVal, setStartVal] = useState(defaultVal)
 
   const displayVal = current != null ? current : defaultVal
-  const ITEM_HEIGHT = 44
 
   const clamp = (v) => Math.min(max, Math.max(min, Math.round(v / step) * step))
 
-  const handleStart = (clientY) => {
-    setIsDragging(true)
-    setStartY(clientY)
-    setStartVal(displayVal)
-    if (current == null) {
-      setCurrent(defaultVal)
-      onChange(String(defaultVal))
-    }
-  }
-
   const handleMove = (clientY) => {
-    if (!isDragging) return
     const diff = startY - clientY
     const steps = Math.round(diff / ITEM_HEIGHT)
     const newVal = clamp(startVal + steps * step)
@@ -274,34 +259,28 @@ export function WheelPicker({ question, value, onChange }) {
     onChange(String(newVal))
   }
 
-  const handleEnd = () => setIsDragging(false)
-
-  // Touch events
-  const onTouchStart = (e) => handleStart(e.touches[0].clientY)
-  const onTouchMove = (e) => { e.preventDefault(); handleMove(e.touches[0].clientY) }
-  const onTouchEnd = () => handleEnd()
-
-  // Mouse events
-  const onMouseDown = (e) => handleStart(e.clientY)
-  const onMouseMove = (e) => { if (isDragging) handleMove(e.clientY) }
-  const onMouseUp = () => handleEnd()
-
-  React.useEffect(() => {
-    if (isDragging) {
-      window.addEventListener("mousemove", onMouseMove)
-      window.addEventListener("mouseup", onMouseUp)
-    }
+  useEffect(() => {
+    if (!isDragging) return
+    const onMove = (e) => handleMove(e.clientY)
+    const onUp = () => setIsDragging(false)
+    window.addEventListener("mousemove", onMove)
+    window.addEventListener("mouseup", onUp)
     return () => {
-      window.removeEventListener("mousemove", onMouseMove)
-      window.removeEventListener("mouseup", onMouseUp)
+      window.removeEventListener("mousemove", onMove)
+      window.removeEventListener("mouseup", onUp)
     }
   }, [isDragging, startY, startVal])
 
-  // Scroll wheel support
-  const onWheel = (e) => {
-    e.preventDefault()
-    const delta = e.deltaY > 0 ? step : -step
-    const newVal = clamp(displayVal + delta)
+  const initVal = () => {
+    if (current == null) {
+      setCurrent(defaultVal)
+      onChange(String(defaultVal))
+    }
+  }
+
+  const adjust = (delta) => {
+    initVal()
+    const newVal = clamp(displayVal + delta * step)
     setCurrent(newVal)
     onChange(String(newVal))
   }
@@ -311,87 +290,63 @@ export function WheelPicker({ question, value, onChange }) {
   const next1 = clamp(displayVal + 1 * step)
   const next2 = clamp(displayVal + 2 * step)
 
-  const rowStyle = (opacity, fontSize, color) => ({
+  const rowStyle = (opacity, fontSize, color, bold) => ({
     height: ITEM_HEIGHT, display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize, fontWeight: 600, color, opacity, userSelect: "none", transition: "all 0.15s"
+    fontSize, fontWeight: bold ? 700 : 500, color, opacity, userSelect: "none"
   })
 
   return (
     <QuestionCard>
       <QuestionLabel label={question.label} />
       {question.help && <HelpText text={question.help} />}
-      <div style={{ marginTop: 12, position: "relative" }}>
-        {/* Instruction */}
+      <div style={{ marginTop: 12 }}>
         {current == null && (
           <p style={{ textAlign: "center", fontSize: 12, color: "#94A3B8", marginBottom: 8 }}>
-            Desliza arriba o abajo para seleccionar
+            Desliza o usa las flechas para seleccionar
           </p>
         )}
-        {/* Wheel container */}
         <div
-          ref={containerRef}
-          onMouseDown={onMouseDown}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          onWheel={onWheel}
+          onMouseDown={(e) => { initVal(); setIsDragging(true); setStartY(e.clientY); setStartVal(displayVal) }}
+          onTouchStart={(e) => { initVal(); setStartY(e.touches[0].clientY); setStartVal(displayVal) }}
+          onTouchMove={(e) => { e.preventDefault(); handleMove(e.touches[0].clientY) }}
+          onWheel={(e) => { e.preventDefault(); adjust(e.deltaY > 0 ? -1 : 1) }}
           style={{
-            height: ITEM_HEIGHT * 5,
-            overflow: "hidden",
-            cursor: isDragging ? "grabbing" : "grab",
-            position: "relative",
-            borderRadius: 14,
+            height: ITEM_HEIGHT * 5, overflow: "hidden", cursor: isDragging ? "grabbing" : "grab",
+            position: "relative", borderRadius: 14, touchAction: "none",
             background: current == null ? "#FFF5F7" : "#FAFBFE",
-            border: current == null ? "2px dashed #dd294640" : "1.5px solid #E2E8F0",
-            touchAction: "none",
-            transition: "background 0.2s, border 0.2s"
+            border: current == null ? "2px dashed #dd294640" : "1.5px solid #E2E8F0"
           }}
         >
-          {/* Highlight bar */}
           <div style={{
-            position: "absolute", top: ITEM_HEIGHT * 2, left: 0, right: 0,
-            height: ITEM_HEIGHT,
-            background: "#dd294610",
-            borderTop: "2px solid #dd294630",
-            borderBottom: "2px solid #dd294630",
+            position: "absolute", top: ITEM_HEIGHT * 2, left: 0, right: 0, height: ITEM_HEIGHT,
+            background: "#dd294610", borderTop: "2px solid #dd294630", borderBottom: "2px solid #dd294630",
             pointerEvents: "none"
           }} />
-          {/* Items */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div>
             <div style={rowStyle(0.2, 13, "#94A3B8")}>{prev2 !== displayVal ? `${prev2} ${unit}` : ""}</div>
             <div style={rowStyle(0.5, 15, "#64748B")}>{prev1 !== displayVal ? `${prev1} ${unit}` : ""}</div>
-            <div style={rowStyle(1, 22, "#dd2946")}>{current != null ? `${displayVal} ${unit}` : `— ${unit} —`}</div>
+            <div style={rowStyle(1, 22, "#dd2946", true)}>{current != null ? `${displayVal} ${unit}` : `— ${unit} —`}</div>
             <div style={rowStyle(0.5, 15, "#64748B")}>{next1 !== displayVal ? `${next1} ${unit}` : ""}</div>
             <div style={rowStyle(0.2, 13, "#94A3B8")}>{next2 !== displayVal ? `${next2} ${unit}` : ""}</div>
           </div>
         </div>
-        {/* Arrow buttons */}
         <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 10 }}>
-          <button
-            onClick={() => { const v = clamp(displayVal - step); setCurrent(v); onChange(String(v)) }}
-            style={{
-              width: 44, height: 44, borderRadius: "50%", border: "1.5px solid #E2E8F0",
-              background: "white", fontSize: 20, cursor: "pointer", color: "#64748B",
-              display: "flex", alignItems: "center", justifyContent: "center"
-            }}
-          >↓</button>
-          <button
-            onClick={() => { const v = clamp(displayVal + step); setCurrent(v); onChange(String(v)) }}
-            style={{
-              width: 44, height: 44, borderRadius: "50%", border: "1.5px solid #E2E8F0",
-              background: "white", fontSize: 20, cursor: "pointer", color: "#64748B",
-              display: "flex", alignItems: "center", justifyContent: "center"
-            }}
-          >↑</button>
+          <button onClick={() => adjust(-1)} style={{
+            width: 44, height: 44, borderRadius: "50%", border: "1.5px solid #E2E8F0",
+            background: "white", fontSize: 20, cursor: "pointer", color: "#64748B",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>↓</button>
+          <button onClick={() => adjust(1)} style={{
+            width: 44, height: 44, borderRadius: "50%", border: "1.5px solid #E2E8F0",
+            background: "white", fontSize: 20, cursor: "pointer", color: "#64748B",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>↑</button>
         </div>
         {current != null && (
-          <button
-            onClick={() => { setCurrent(null); onChange(null) }}
-            style={{
-              display: "block", margin: "8px auto 0", background: "none", border: "none",
-              fontSize: 12, color: "#CBD5E1", cursor: "pointer"
-            }}
-          >Borrar selección</button>
+          <button onClick={() => { setCurrent(null); onChange(null) }} style={{
+            display: "block", margin: "8px auto 0", background: "none", border: "none",
+            fontSize: 12, color: "#CBD5E1", cursor: "pointer"
+          }}>Borrar selección</button>
         )}
       </div>
     </QuestionCard>
