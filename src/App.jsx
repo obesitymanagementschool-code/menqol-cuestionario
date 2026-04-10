@@ -624,18 +624,9 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
   const gynData = studyData.gynecology || {}
   const reproStage = classifyReproductiveStage(gynData)
 
-  // Auto-save on mount (once only)
-  useEffect(() => {
-    if (!hasSaved.current) {
-      hasSaved.current = true
-      handleSave()
-    }
-  }, [])
-
   const handleSave = async () => {
     setSaveStatus("saving")
     try {
-      // Build domain scores
       const scores = {
         vasomotor:    domainResults[0]?.mean ?? null,
         psychosocial: domainResults[1]?.mean ?? null,
@@ -643,9 +634,14 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
         sexual:       domainResults[3]?.mean ?? null,
       }
 
-      // El frontend llama a la Edge Function en los servidores de Supabase.
-      // Allí es donde se usa la service_role key — nunca llega al navegador.
-      const response = await fetch(EDGE_FUNCTION_URL, {
+      const url = EDGE_FUNCTION_URL
+      if (!url || url.includes('TU_PROJECT_ID')) {
+        console.error("VITE_SUPABASE_FUNCTION_URL no configurada")
+        setSaveStatus("error")
+        return
+      }
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -669,6 +665,14 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
       setSaveStatus("error")
     }
   }
+
+  // Auto-save on mount (once only)
+  useEffect(() => {
+    if (!hasSaved.current) {
+      hasSaved.current = true
+      handleSave()
+    }
+  }, [])
 
   return (
     <div className="fade-in">
@@ -893,7 +897,7 @@ function MenqolSectionView({ currentDomain, setCurrentDomain, answers, onAnswer,
 
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         {currentDomain > 0 && (
-          <button onClick={() => { setCurrentDomain(p => p - 1); scrollTop() }} style={{
+          <button onClick={() => { setCurrentDomain(p => p - 1); setTimeout(() => scrollTop(), 50) }} style={{
             flex: 1, padding: 14, borderRadius: 14,
             background: "white", color: "#64748B", border: "1.5px solid #E2E8F0",
             fontSize: 15, fontWeight: 600, cursor: "pointer"
@@ -901,7 +905,7 @@ function MenqolSectionView({ currentDomain, setCurrentDomain, answers, onAnswer,
         )}
         <button
           onClick={() => {
-            if (currentDomain < DOMAINS.length - 1) { setCurrentDomain(p => p + 1); scrollTop() }
+            if (currentDomain < DOMAINS.length - 1) { setCurrentDomain(p => p + 1); setTimeout(() => scrollTop(), 50) }
             else if (isDomainComplete()) onComplete()
           }}
           disabled={!isDomainComplete()}
@@ -977,14 +981,21 @@ export default function App() {
   const goNext = () => {
     if (currentSection < sections.length - 1) {
       setCurrentSection(p => p + 1)
-      scrollTop()
+      setTimeout(() => scrollTop(), 50)
+    }
+  }
+
+  const goPrevSection = () => {
+    if (currentSection > 0) {
+      setCurrentSection(p => p - 1)
+      setTimeout(() => scrollTop(), 50)
     }
   }
 
   const goPrev = () => {
     if (currentSection > 0) {
       setCurrentSection(p => p - 1)
-      scrollTop()
+      setTimeout(() => scrollTop(), 50)
     }
   }
 
@@ -1145,7 +1156,7 @@ export default function App() {
             {section.id !== "results" && section.id !== "menqol" && (
               <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
                 {currentSection > 0 && (
-                  <button onClick={goPrev} style={{
+                  <button onClick={goPrevSection} style={{
                     flex: 1, padding: 14, borderRadius: 14,
                     background: "white", color: "#64748B", border: "1.5px solid #E2E8F0",
                     fontSize: 15, fontWeight: 600, cursor: "pointer"
