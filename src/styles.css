@@ -72,6 +72,55 @@ input[type=number] {
 @media print {
   body { background: white !important; }
   .no-print { display: none !important; }
+  button { display: none !important; }
+  .save-status-bar { display: none !important; }
+  .pdf-download-btn { display: none !important; }
+  header, nav { display: none !important; }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+}@keyframes barGrow {
+  from { width: 0; }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease;
+}
+
+.bar-grow {
+  animation: barGrow 0.8s ease-out;
+}
+
+/* Info sheet sections */
+.info-section {
+  border-bottom: 1px solid #F1F5F9;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.info-section:last-child {
+  border-bottom: none;
+}
+
+/* Scrollable content areas */
+.scroll-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Print styles */
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
 }
 
 /* Mobile optimizations */
