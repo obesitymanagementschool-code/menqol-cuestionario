@@ -337,7 +337,7 @@ function ConsentScreen({ onAccept }) {
           </ul>
 
           <p style={{ marginTop: 14 }}>Comprendo que puedo ejercer mis derechos de acceso, rectificación, supresión, limitación del tratamiento, oposición, portabilidad, dirigiéndome a cualquiera de los investigadores principales del estudio o a cualquiera de las entidades corresponsables del tratamiento.</p>
-          <p style={{ marginTop: 10 }}>Asimismo, tengo derecho a presentar una reclamación ante la <strong>Agencia Española de Protección de Datos (AEPD)</strong> si considero que el tratamiento de mis datos personales no se ajusta a la normativa vigente.</p>
+          <p style={{ marginTop: 10 }}>Asimismo, tengo derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD) si considero que el tratamiento de mis datos personales no se ajusta a la normativa vigente.</p>
           <p style={{ marginTop: 10 }}>La retirada del consentimiento no afectará a la licitud del tratamiento basado en el consentimiento previo a su retirada.</p>
           <p style={{ marginTop: 10 }}>Este estudio ha sido evaluado por el correspondiente Comité de Ética de Investigación de la Universidad Politécnica de Madrid el cual puede ser contactado en <a href="mailto:secretaria.adjunto.vinvestigacion@upm.es" style={{ color: "#dd2946" }}>secretaria.adjunto.vinvestigacion@upm.es</a>.</p>
 
@@ -494,7 +494,7 @@ function ScaleSelector({ value, onChange, color }) {
 }
 
 /* ─── Single MENQOL Question Item ─── */
-function MenqolQuestionItem({ item, domain, answer, onAnswer, openTooltip, setOpenTooltip }) {
+function MenqolQuestionItem({ item, domain, answer, onAnswer }) {
   const isYes = answer?.present === true
   const needsRating = isYes && answer?.rating == null
 
@@ -505,21 +505,10 @@ function MenqolQuestionItem({ item, domain, answer, onAnswer, openTooltip, setOp
       boxShadow: needsRating ? `0 0 0 3px ${domain.color}18` : "0 1px 3px rgba(0,0,0,0.04)",
       transition: "all 0.2s"
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#1E293B", flex: 1, lineHeight: 1.4 }}>
+      <div style={{ marginBottom: 10 }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#1E293B", lineHeight: 1.4 }}>
           {item.label}
         </span>
-        <button
-          onClick={() => setOpenTooltip(openTooltip === item.id ? null : item.id)}
-          aria-label="Más información"
-          style={{
-            width: 28, height: 28, borderRadius: "50%",
-            border: "1.5px solid #CBD5E1",
-            background: openTooltip === item.id ? "#F1F5F9" : "white",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", fontSize: 14, color: "#64748B", flexShrink: 0
-          }}
-        >?</button>
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
@@ -898,8 +887,6 @@ function MenqolSectionView({ currentDomain, setCurrentDomain, answers, onAnswer,
             domain={domain}
             answer={answers[item.id]}
             onAnswer={onAnswer}
-            openTooltip={openTooltip}
-            setOpenTooltip={setOpenTooltip}
           />
         ))}
       </div>
@@ -973,31 +960,18 @@ export default function App() {
   const canProceed = () => {
     if (!section) return false
     const sid = section.id
-
-    if (sid === "menqol") {
-      return DOMAINS.every(d => d.items.every(item => {
-        const a = menqolAnswers[item.id]
-        if (!a) return false
-        if (a.present === false) return true
-        return a.present === true && a.rating != null
-      }))
-    }
-
-    if (sid === "ipaqLong") {
-      const allQ = IPAQ_LONG.parts ? IPAQ_LONG.parts.flatMap(p => p.questions) : IPAQ_LONG.questions
-      const ans = getSectionAnswers(sid)
-      return allQ.filter(q => !q.condition).every(q => ans[q.id] != null)
-    }
-
     if (sid === "results") return true
 
-    const ans = getSectionAnswers(sid)
-    const visibleQ = section.questions.filter(q => isConditionMet(q, ans))
-    const requiredQ = visibleQ.filter(q => q.required)
-    if (requiredQ.length > 0) {
+    // Solo obligamos a rellenar los campos requeridos de datos básicos (nombre, apellido, email, edad)
+    if (sid === "basics") {
+      const ans = getSectionAnswers(sid)
+      const visibleQ = section.questions.filter(q => isConditionMet(q, ans))
+      const requiredQ = visibleQ.filter(q => q.required)
       return requiredQ.every(q => ans[q.id] != null && ans[q.id] !== "")
     }
-    return visibleQ.some(q => ans[q.id] != null)
+
+    // El resto de secciones siempre se puede avanzar (respuestas opcionales)
+    return true
   }
 
   const goNext = () => {
