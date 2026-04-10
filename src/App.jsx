@@ -117,28 +117,29 @@ function InfoSheetScreen({ onAccept }) {
         border: "1.5px solid #F1F5F9", boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
         overflow: "hidden"
       }}>
-        {/* Title block */}
+        {/* Cabecera */}
         <div style={{ background: "linear-gradient(135deg, #dd2946 0%, #b01e35 100%)", padding: "24px 20px" }}>
-          <p style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-            Hoja de información al participante
+          <p style={{ fontSize: 11, color: "#fca5a5", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+            Información del estudio para participantes
           </p>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "white", lineHeight: 1.4, marginBottom: 0 }}>
-            Mujeres de hierro: prevalencia de sintomatología asociada a la menopausia a lo largo de la transición menopáusica en mujeres de 40 a 70 años residentes en España y su relación con la actividad física
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "white", lineHeight: 1.5 }}>
+            Título del estudio: Mujeres de hierro: prevalencia de sintomatología asociada a la menopausia a lo largo de la transición menopáusica en mujeres de 40 a 70 años residentes en España y su relación con la actividad física.
           </h2>
         </div>
 
         <div style={{ padding: "20px 20px" }}>
 
-          {/* Section 1 */}
           <InfoSection title="1. ¿Quién realiza este estudio?">
-            <p>El presente estudio está dirigido científicamente por <strong>Cuerpos Serranos SL y la Universidad Politécnica de Madrid (UPM)</strong>, que actúan como corresponsables del diseño metodológico, la supervisión científica y el análisis de los resultados de la investigación.</p>
-            <p style={{ marginTop: 12 }}>Los investigadores principales son:</p>
+            <p>El presente estudio está dirigido científicamente por <strong>Cuerpos Serranos SL y la Universidad Politécnica de Madrid (UPM)</strong>, que actúa como corresponsables del diseño metodológico, la supervisión científica y el análisis de los resultados de la investigación.</p>
+            <p style={{ marginTop: 10 }}>Los investigadores principales son:</p>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
               <ResearcherCard name="Dra. Maria de los Ángeles García" org="Cuerpos Serranos SL" email="info@cuerposserranos.com" />
               <ResearcherCard name="Dr. Javier Butragueño" org="Cuerpos Serranos SL" email="info@cuerposserranos.com" />
               <ResearcherCard name="Dra. Ana Belén Peinado" org="Universidad Politécnica de Madrid" email="anabelen.peinado@upm.es" />
             </div>
-            <p style={{ marginTop: 12 }}>La Universidad Politécnica de Madrid y Cuerpos Serranos S.L. actúan como corresponsables del tratamiento de conformidad con lo dispuesto en el <strong>artículo 26 del Reglamento (UE) 2016/679 (RGPD)</strong>.</p>
+            <p style={{ marginTop: 12 }}><strong>Cuerpos Serranos S.L.</strong> proporciona la infraestructura tecnológica necesaria para el desarrollo de la plataforma online de recogida de datos, así como las acciones de difusión y captación de participantes.</p>
+            <p style={{ marginTop: 10 }}>En relación con el tratamiento de los datos personales recogidos en el marco del estudio, <strong>la Universidad Politécnica de Madrid y Cuerpos Serranos S.L. actúan como corresponsables del tratamiento</strong>, al determinar conjuntamente los fines y medios del tratamiento de los datos personales necesarios para el desarrollo del proyecto de investigación, de conformidad con lo dispuesto en el <strong>artículo 26 del Reglamento (UE) 2016/679 (RGPD)</strong>.</p>
+            <p style={{ marginTop: 10 }}>Ambas entidades han formalizado el correspondiente <strong>acuerdo de corresponsabilidad</strong>, en el que se establecen de manera transparente sus respectivas responsabilidades en relación con el cumplimiento de las obligaciones derivadas de la normativa de protección de datos, así como los mecanismos de cooperación necesarios para garantizar el ejercicio efectivo de los derechos de las personas participantes.</p>
           </InfoSection>
 
           <InfoSection title="2. ¿Cuál es el objetivo del estudio?">
@@ -148,7 +149,7 @@ function InfoSheetScreen({ onAccept }) {
 
           <InfoSection title="3. ¿Quién puede participar?">
             <p>Pueden participar mujeres:</p>
-            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 1.8 }}>
+            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 2 }}>
               <li>Residentes en España</li>
               <li>Con edades entre 40 y 70 años, ambas incluidas</li>
               <li>En etapa de premenopausia, perimenopausia o postmenopausia</li>
@@ -157,64 +158,65 @@ function InfoSheetScreen({ onAccept }) {
           </InfoSection>
 
           <InfoSection title="4. ¿En qué consiste la participación?">
-            <p>Si decides participar, deberás completar un cuestionario online que incluye:</p>
-            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 1.8 }}>
+            <p>Si decide participar, deberá completar un cuestionario online que incluye:</p>
+            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 2 }}>
               <li>Datos sociodemográficos</li>
               <li>Información sobre historia menstrual y antecedentes de salud</li>
               <li>Cuestionario validado sobre actividad física (IPAQ versión larga)</li>
               <li>Cuestionario validado sobre sintomatología menopáusica (MENQOL)</li>
             </ul>
-            <p style={{ marginTop: 10 }}>La duración estimada es de <strong>15 a 25 minutos</strong>.</p>
-            <p style={{ marginTop: 10 }}>Al finalizar, recibirás un <strong>informe individualizado</strong> con información sobre tu nivel de sintomatología menopáusica y tu nivel de actividad física, basado en instrumentos científicos validados. Este informe es informativo y no sustituye la valoración médica profesional.</p>
+            <p style={{ marginTop: 10 }}>La duración estimada es de 15 a 25 minutos.</p>
+            <p style={{ marginTop: 10 }}>Al finalizar, recibirá un <strong>informe individualizado</strong> con información sobre su nivel de sintomatología menopáusica y su nivel de actividad física, basado en instrumentos científicos validados. Este informe es informativo y no sustituye la valoración médica profesional.</p>
           </InfoSection>
 
           <InfoSection title="5. ¿Existen riesgos?">
             <p>Este estudio no implica intervención clínica ni procedimientos invasivos, por lo que no existen riesgos físicos.</p>
-            <p style={{ marginTop: 10 }}>Podrías experimentar una leve incomodidad al responder preguntas relacionadas con síntomas o antecedentes de salud. Puedes interrumpir el cuestionario o abandonar el estudio en cualquier momento sin necesidad de justificar tu decisión y sin que ello tenga consecuencias.</p>
+            <p style={{ marginTop: 10 }}>Podría experimentar una leve incomodidad al responder preguntas relacionadas con síntomas o antecedentes de salud. Puede interrumpir el cuestionario o abandonar el estudio en cualquier momento sin necesidad de justificar su decisión y sin que ello tenga consecuencias.</p>
           </InfoSection>
 
           <InfoSection title="6. ¿Existen beneficios?">
             <p>No existen beneficios clínicos directos. Sin embargo:</p>
-            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 1.8 }}>
-              <li>Recibirás información personalizada basada en instrumentos científicos validados.</li>
-              <li>Contribuirás al avance del conocimiento científico en salud femenina.</li>
-              <li>Ayudarás al diseño de futuras estrategias de promoción de la salud.</li>
+            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 2 }}>
+              <li>Recibirá información personalizada basada en instrumentos científicos validados.</li>
+              <li>Contribuirá al avance del conocimiento científico en salud femenina.</li>
+              <li>Ayudará al diseño de futuras estrategias de promoción de la salud.</li>
             </ul>
             <p style={{ marginTop: 10 }}>El balance entre riesgos y beneficios se considera favorable.</p>
           </InfoSection>
 
           <InfoSection title="7. ¿Cómo se protegerán sus datos?">
             <p>El estudio cumple con:</p>
-            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 1.8 }}>
+            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 2 }}>
               <li>Reglamento (UE) 2016/679 (RGPD)</li>
               <li>Ley Orgánica 3/2018 de Protección de Datos y garantía de los derechos digitales</li>
               <li>Ley 14/2007 de Investigación Biomédica</li>
             </ul>
             <p style={{ marginTop: 10 }}>Dado que se recogerán datos relativos a la salud (categoría especial de datos según el artículo 9 del RGPD), se aplican medidas reforzadas de seguridad.</p>
-            <div style={{ background: "#F8FAFC", borderRadius: 10, padding: 14, marginTop: 12 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 8 }}>Medidas de protección implementadas:</p>
-              <ul style={{ paddingLeft: 16, lineHeight: 1.8, fontSize: 13, color: "#64748B" }}>
-                <li>La plataforma utiliza conexión cifrada segura (HTTPS/TLS).</li>
-                <li>Los datos se almacenan en infraestructura gestionada mediante Supabase (SOC 2 Tipo II).</li>
-                <li>Sus datos serán seudonimizados mediante un código alfanumérico.</li>
-                <li>Los datos identificativos se almacenarán separadamente de los datos de salud.</li>
-                <li>El acceso a la base de datos está restringido al equipo investigador principal.</li>
-              </ul>
-            </div>
+            <p style={{ marginTop: 10, fontWeight: 600, color: "#1E293B" }}>Medidas de protección implementadas:</p>
+            <ul style={{ marginTop: 8, paddingLeft: 18, lineHeight: 2 }}>
+              <li>La plataforma utiliza conexión cifrada segura (HTTPS/TLS).</li>
+              <li>Los datos se almacenan en infraestructura gestionada mediante Supabase, que cumple estándares internacionales de seguridad auditados bajo el marco SOC 2 Tipo II, garantizando controles continuos de seguridad, disponibilidad, integridad y confidencialidad.</li>
+              <li>Sus datos serán seudonimizados mediante un código alfanumérico.</li>
+              <li>Los datos identificativos, si fueran necesarios para la gestión del consentimiento o envío del informe, se almacenarán separadamente de los datos de salud.</li>
+              <li>El acceso a la base de datos está restringido al equipo investigador principal.</li>
+              <li>No se comunicarán datos personales a terceros, salvo obligación legal o cuando resulte necesario para el desarrollo técnico del estudio en el marco de servicios tecnológicos contratados, siempre con las garantías adecuadas conforme al Reglamento (UE) 2016/679.</li>
+            </ul>
+            <p style={{ marginTop: 10 }}>Los resultados del estudio se publicarán exclusivamente de forma agregada y anonimizada, sin posibilidad de identificación individual.</p>
           </InfoSection>
 
           <InfoSection title="8. ¿Durante cuánto tiempo se conservarán los datos?">
-            <p>Los datos personales identificables se conservarán únicamente durante el tiempo necesario para la gestión del estudio y el análisis científico derivado del mismo. Una vez finalizado el proyecto, los datos podrán mantenerse de forma anonimizada con fines exclusivamente científicos y estadísticos, conforme a la normativa vigente.</p>
+            <p>Los datos personales identificables se conservarán únicamente durante el tiempo necesario para la gestión del estudio y el análisis científico derivado del mismo. Una vez finalizado el proyecto, los datos podrán mantenerse de forma anonimizada con fines exclusivamente científicos y estadísticos, conforme a la normativa vigente en materia de investigación.</p>
           </InfoSection>
 
           <InfoSection title="9. ¿Cuáles son sus derechos?">
-            <p>Podrás ejercer en cualquier momento tus derechos de acceso, rectificación, supresión, limitación del tratamiento, oposición y portabilidad dirigiéndote a la investigadora principal del estudio o a cualquiera de las entidades corresponsables del tratamiento.</p>
-            <p style={{ marginTop: 10 }}>También puedes presentar una reclamación ante la <strong>Agencia Española de Protección de Datos</strong> si consideras que tus derechos no han sido atendidos adecuadamente.</p>
+            <p>Las participantes podrán ejercer en cualquier momento sus derechos de acceso, rectificación, supresión, limitación del tratamiento, oposición y portabilidad dirigiéndose a la investigadora principal del estudio o a cualquiera de las entidades corresponsables del tratamiento.</p>
+            <p style={{ marginTop: 10 }}>Las solicitudes serán gestionadas de forma coordinada entre ambas entidades con el fin de garantizar una respuesta adecuada y en los plazos previstos por la normativa de protección de datos.</p>
+            <p style={{ marginTop: 10 }}>También puede presentar una reclamación ante la Agencia Española de Protección de Datos si considera que sus derechos no han sido atendidos adecuadamente.</p>
           </InfoSection>
 
           <InfoSection title="10. Participación voluntaria">
-            <p>Tu participación es completamente voluntaria. Puedes retirarte en cualquier momento sin consecuencias. La decisión de no participar no afectará a tu relación con Cuerpos Serranos S.L. ni con la Universidad Politécnica de Madrid.</p>
-            <p style={{ marginTop: 10 }}>Si deseas participar, en la siguiente pantalla podrás otorgar tu consentimiento informado electrónico.</p>
+            <p>Su participación es completamente voluntaria. Puede retirarse en cualquier momento sin consecuencias. La decisión de no participar no afectará a su relación con Cuerpos Serranos S.L. ni con la Universidad Politécnica de Madrid.</p>
+            <p style={{ marginTop: 10 }}>Si desea participar, en la siguiente pantalla podrá otorgar su consentimiento informado electrónico.</p>
           </InfoSection>
 
           {/* Checkbox */}
@@ -280,7 +282,7 @@ function ResearcherCard({ name, org, email }) {
     <div style={{ background: "#F8FAFC", borderRadius: 10, padding: "10px 14px" }}>
       <p style={{ fontSize: 13, fontWeight: 700, color: "#1E293B" }}>{name}</p>
       <p style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>{org}</p>
-      <p style={{ fontSize: 12, color: "#7C9CE8", marginTop: 2 }}>{email}</p>
+      <p style={{ fontSize: 12, color: "#dd2946", marginTop: 2 }}>{email}</p>
     </div>
   )
 }
@@ -300,11 +302,11 @@ function ConsentScreen({ onAccept }) {
         overflow: "hidden"
       }}>
         <div style={{ background: "linear-gradient(135deg, #dd2946 0%, #b01e35 100%)", padding: "24px 20px" }}>
-          <p style={{ fontSize: 11, color: "#DDD6FE", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-            Consentimiento informado
+          <p style={{ fontSize: 11, color: "#fca5a5", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+            Consentimiento informado para participantes
           </p>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "white", lineHeight: 1.4 }}>
-            Mujeres de hierro: Prevalencia de sintomatología asociada a la menopausia
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "white", lineHeight: 1.5 }}>
+            Título del estudio: Mujeres de hierro: Prevalencia de sintomatología asociada a la menopausia a lo largo de la transición menopáusica en mujeres de 40 a 70 años residentes en España y su relación con la actividad física.
           </h2>
         </div>
 
@@ -312,30 +314,34 @@ function ConsentScreen({ onAccept }) {
           <p>He leído y comprendido la hoja de Información para las participantes. He tenido la oportunidad de conocer los objetivos del estudio, el procedimiento, los posibles riesgos y beneficios, así como el tratamiento que se realizará de mis datos personales y de salud.</p>
 
           <p style={{ fontWeight: 700, color: "#1E293B", marginTop: 16, marginBottom: 8 }}>Declaro que:</p>
-          <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
+          <ul style={{ paddingLeft: 18, lineHeight: 2 }}>
             <li>He comprendido que mi participación es voluntaria y que puedo retirarme en cualquier momento sin necesidad de justificar mi decisión y sin que ello tenga consecuencias negativas para mí.</li>
             <li>Comprendo que el estudio es de carácter observacional y que no implica intervención clínica ni sustituye el asesoramiento médico profesional.</li>
-            <li>Sé que completaré cuestionarios validados sobre sintomatología menopáusica y nivel de actividad física, además de preguntas sociodemográficas y relacionadas con mi salud. Podré omitir cualquier pregunta que no desee responder.</li>
-            <li>He sido informada de que recibiré un informe individualizado con información sobre mis resultados, basado en instrumentos científicos validados. El informe tendrá carácter meramente informativo y no constituye diagnóstico médico.</li>
-            <li>Comprendo que se recogerán datos relativos a mi salud, considerados categoría especial de datos conforme al artículo 9 del RGPD.</li>
+            <li>Sé que completaré cuestionarios validados sobre sintomatología menopáusica y nivel de actividad física. Además, responderé preguntas sociodemográficas y relacionadas con mi salud. No obstante, podré omitir cualquier pregunta que no desee responder.</li>
+            <li>He sido informada de que recibiré un informe individualizado con información sobre mis resultados, basado en instrumentos científicos validados. El informe individualizado tendrá carácter meramente informativo y no constituye diagnóstico médico ni sustituye la valoración de profesionales sanitarios.</li>
+            <li>Comprendo que se recogerán datos relativos a mi salud, considerados categoría especial de datos conforme al artículo 9 del Reglamento (UE) 2016/679 (RGPD).</li>
           </ul>
 
           <p style={{ fontWeight: 700, color: "#1E293B", marginTop: 16, marginBottom: 8 }}>He sido informada de que:</p>
-          <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
-            <li>Cuerpos Serranos S.L. y la Universidad Politécnica de Madrid (UPM) actúan como corresponsables del tratamiento de los datos personales, de conformidad con el artículo 26 del RGPD.</li>
-            <li>Los investigadores principales son la Dra. María de los Ángeles García y el Dr. Javier Butragueño (Cuerpos Serranos SL, <a href="mailto:info@cuerposserranos.com" style={{ color: "#7C9CE8" }}>info@cuerposserranos.com</a>) y la Dra. Ana Belén Peinado (UPM, <a href="mailto:anabelen.peinado@upm.es" style={{ color: "#7C9CE8" }}>anabelen.peinado@upm.es</a>).</li>
-            <li>La plataforma tecnológica está alojada en infraestructura gestionada mediante Supabase, auditada bajo el estándar SOC 2 Tipo II.</li>
-            <li>Mis datos serán seudonimizados mediante un código alfanumérico y tratados con medidas técnicas y organizativas adecuadas.</li>
-            <li>Los datos identificativos se almacenarán de forma separada de los datos de salud.</li>
-            <li>Los resultados se analizarán exclusivamente de forma agregada y anonimizada, sin posibilidad de identificación individual.</li>
+          <ul style={{ paddingLeft: 18, lineHeight: 2 }}>
+            <li>Cuerpos Serranos S.L. y la Universidad Politécnica de Madrid (UPM) actúan como corresponsables del tratamiento de los datos personales recogidos en el marco de este estudio, al determinar conjuntamente los fines y medios del tratamiento, de conformidad con el artículo 26 del Reglamento (UE) 2016/679 (RGPD).</li>
+            <li>Cuerpos Serranos S.L y la Universidad Politécnica de Madrid dirigen científicamente el estudio y supervisan el diseño metodológico, el análisis estadístico y la interpretación científica de los resultados, comprometiéndose estos a la independencia científica y la publicación de los resultados con independencia de su dirección o magnitud.</li>
+            <li>Cuerpos Serranos S.L. proporcionará la infraestructura tecnológica para la recogida y almacenamiento de los datos.</li>
+            <li>Ambas entidades han formalizado un acuerdo de corresponsabilidad en el que se establecen sus respectivas responsabilidades en materia de protección de datos y los mecanismos de coordinación para garantizar el ejercicio efectivo de los derechos de las participantes.</li>
+            <li>Los investigadores principales del estudio son la Dra. María de los Ángeles García (Cuerpos Serranos SL), el Dr. Javier Butragueño (Cuerpos Serranos SL) y la Dra. Ana Belén Peinado (Universidad Politécnica de Madrid), a quienes puedo contactar a través del correo electrónico: <a href="mailto:info@cuerposserranos.com" style={{ color: "#dd2946" }}>info@cuerposserranos.com</a> o <a href="mailto:anabelen.peinado@upm.es" style={{ color: "#dd2946" }}>anabelen.peinado@upm.es</a></li>
+            <li>La plataforma tecnológica del estudio está alojada en infraestructura gestionada mediante Supabase, que implementa medidas de seguridad auditadas bajo el estándar SOC 2 Tipo II, garantizando controles de seguridad, disponibilidad, integridad y confidencialidad.</li>
+            <li>Mis datos serán seudonimizados mediante un código alfanumérico y tratados con medidas técnicas y organizativas adecuadas para garantizar su seguridad.</li>
+            <li>En caso de recogerse datos identificativos necesarios para la gestión del consentimiento o el envío del informe individualizado, estos se almacenarán de forma separada de los datos de salud.</li>
+            <li>Los datos personales se conservarán únicamente durante el tiempo necesario para el desarrollo del estudio y el análisis científico de los resultados. Finalizado el proyecto, los datos identificativos serán eliminados y únicamente podrán conservarse datos anonimizados con fines de investigación científica y verificación de los resultados.</li>
+            <li>Los resultados del estudio se analizarán exclusivamente de forma agregada y anonimizada, y en ningún caso se publicará información que permita mi identificación.</li>
           </ul>
 
-          <p style={{ marginTop: 14 }}>Comprendo que puedo ejercer mis derechos de acceso, rectificación, supresión, limitación del tratamiento, oposición y portabilidad, dirigiéndome a cualquiera de los investigadores principales.</p>
+          <p style={{ marginTop: 14 }}>Comprendo que puedo ejercer mis derechos de acceso, rectificación, supresión, limitación del tratamiento, oposición, portabilidad, dirigiéndome a cualquiera de los investigadores principales del estudio o a cualquiera de las entidades corresponsables del tratamiento.</p>
           <p style={{ marginTop: 10 }}>Asimismo, tengo derecho a presentar una reclamación ante la <strong>Agencia Española de Protección de Datos (AEPD)</strong> si considero que el tratamiento de mis datos personales no se ajusta a la normativa vigente.</p>
           <p style={{ marginTop: 10 }}>La retirada del consentimiento no afectará a la licitud del tratamiento basado en el consentimiento previo a su retirada.</p>
-          <p style={{ marginTop: 10 }}>Este estudio ha sido evaluado por el Comité de Ética de Investigación de la Universidad Politécnica de Madrid (<a href="mailto:secretaria.adjunto.vinvestigacion@upm.es" style={{ color: "#7C9CE8" }}>secretaria.adjunto.vinvestigacion@upm.es</a>).</p>
+          <p style={{ marginTop: 10 }}>Este estudio ha sido evaluado por el correspondiente Comité de Ética de Investigación de la Universidad Politécnica de Madrid el cual puede ser contactado en <a href="mailto:secretaria.adjunto.vinvestigacion@upm.es" style={{ color: "#dd2946" }}>secretaria.adjunto.vinvestigacion@upm.es</a>.</p>
 
-          {/* Checkbox 1 - required */}
+          {/* Checkbox 1 - obligatorio */}
           <div
             onClick={() => setChecked1(c => !c)}
             style={{
@@ -354,12 +360,12 @@ function ConsentScreen({ onAccept }) {
             }}>
               {checked1 && <span style={{ color: "white", fontSize: 14, fontWeight: 700 }}>✓</span>}
             </div>
-            <p style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, fontWeight: 500 }}>
-              <strong>Declaro que he leído y comprendido la información anterior y que consiento libre y voluntariamente participar en el estudio, así como el tratamiento de mis datos personales y datos de salud con fines exclusivamente científicos en el marco del presente proyecto.</strong>
+            <p style={{ fontSize: 14, color: "#1E293B", lineHeight: 1.6, fontWeight: 600 }}>
+              Declaro que he leído y comprendido la información anterior y que consiento libre y voluntariamente participar en el estudio, así como el tratamiento de mis datos personales y datos de salud con fines exclusivamente científicos en el marco del presente proyecto.
             </p>
           </div>
 
-          {/* Checkbox 2 - optional */}
+          {/* Checkbox 2 - opcional */}
           <div
             onClick={() => setChecked2(c => !c)}
             style={{
@@ -378,8 +384,8 @@ function ConsentScreen({ onAccept }) {
             }}>
               {checked2 && <span style={{ color: "white", fontSize: 14, fontWeight: 700 }}>✓</span>}
             </div>
-            <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
-              Acepto que se utilice mi correo electrónico para comunicaciones relacionadas con este estudio. <span style={{ color: "#94A3B8" }}>(Opcional)</span>
+            <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.6, fontWeight: 600 }}>
+              Acepto que se utilice mi correo electrónico para comunicaciones relacionadas con este estudio.
             </p>
           </div>
 
