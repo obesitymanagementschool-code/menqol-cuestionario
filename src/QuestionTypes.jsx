@@ -164,18 +164,20 @@ export function SelectQuestion({ question, value, onChange }) {
   return (
     <QuestionCard>
       <QuestionLabel label={question.label} />
+      {question.sublabel && <p style={{ fontSize: 12, color: "#94A3B8", marginTop: 4, marginBottom: 4 }}>{question.sublabel}</p>}
       {question.help && <HelpText text={question.help} />}
       <select
         value={value ?? ""}
         onChange={e => onChange(e.target.value || null)}
         style={{
           width: "100%", padding: "12px 16px", borderRadius: 12,
-          border: "1.5px solid #E2E8F0", fontSize: 14, color: value ? "#1E293B" : "#94A3B8",
+          border: "1.5px solid #E2E8F0", fontSize: 14,
+          color: value ? "#1E293B" : "#94A3B8",
           outline: "none", background: "#FAFBFE", marginTop: 10,
           appearance: "none", cursor: "pointer"
         }}
       >
-        <option value="">Selecciona una opción</option>
+        <option value="">— Selecciona —</option>
         {question.options.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
@@ -184,7 +186,7 @@ export function SelectQuestion({ question, value, onChange }) {
   );
 }
 
-/* ─── Checkbox (multi-select) ─── */
+/* ─── Checkbox/* ─── Checkbox (multi-select) ─── */
 export function CheckboxQuestion({ question, value, onChange }) {
   const selected = value || [];
   const toggle = (v) => {
