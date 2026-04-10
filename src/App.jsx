@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { DOMAINS } from './data.js'
-// La conexión a Supabase se hace server-side en la Edge Function
+// La conexión  a Supabase se hace server-side en la Edge Function
 // El frontend solo llama a la función — nunca escribe directamente en la BD
 const EDGE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL
   ?? 'https://TU_PROJECT_ID.supabase.co/functions/v1/submit-response'
