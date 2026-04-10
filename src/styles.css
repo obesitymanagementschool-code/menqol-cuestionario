@@ -85,7 +85,31 @@ input[type=number] {
   }
 }
 
-/* Disable pull-to-refresh on mobile */
-body {
+/* Disable pull-to-refresh on mobile (Android + iOS) */
+html, body {
   overscroll-behavior-y: contain;
+  overflow: hidden;
+  height: 100%;
+  position: fixed;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Disable pull-to-refresh on mobile + iOS scroll fix */
+html, body {
+  overscroll-behavior-y: contain;
+  /* iOS Safari scroll fix */
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
