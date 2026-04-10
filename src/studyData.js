@@ -34,10 +34,12 @@ export const SECTION_BASICS = {
     },
     {
       id: "age",
-      type: "number",
+      type: "select",
       label: "Edad (años)",
-      placeholder: "Ej: 52",
-      min: 30, max: 85,
+      options: [
+        ...Array.from({ length: 41 }, (_, i) => ({ value: String(i + 45), label: `${i + 45} años` })),
+        ...Array.from({ length: 15 }, (_, i) => ({ value: String(i + 30), label: `${i + 30} años` }))
+      ],
       required: true,
       help: "Tu edad actual en años cumplidos. Este estudio está dirigido a mujeres de 40 a 70 años."
     },
@@ -45,7 +47,10 @@ export const SECTION_BASICS = {
       id: "weight",
       type: "select",
       label: "Peso (kg)",
-      options: Array.from({ length: 271 }, (_, i) => ({ value: String(i + 30), label: `${i + 30} kg` })),
+      options: [
+        ...Array.from({ length: 241 }, (_, i) => ({ value: String(i + 60), label: `${i + 60} kg` })),
+        ...Array.from({ length: 30 }, (_, i) => ({ value: String(i + 30), label: `${i + 30} kg` }))
+      ],
       required: false,
       help: "Tu peso actual aproximado en kilogramos."
     },
@@ -53,7 +58,10 @@ export const SECTION_BASICS = {
       id: "height",
       type: "select",
       label: "Talla (cm)",
-      options: Array.from({ length: 201 }, (_, i) => ({ value: String(i + 50), label: `${i + 50} cm` })),
+      options: [
+        ...Array.from({ length: 91 }, (_, i) => ({ value: String(i + 160), label: `${i + 160} cm` })),
+        ...Array.from({ length: 110 }, (_, i) => ({ value: String(i + 50), label: `${i + 50} cm` }))
+      ],
       required: false,
       help: "Tu estatura en centímetros."
     }
@@ -485,10 +493,9 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "amenorrhea90Count",
-      type: "number",
+      type: "select",
       label: "Indique el número de veces aproximado que tuvo faltas de menstruación de más de 90 días previas a los 40 años",
-      placeholder: "Número de veces",
-      min: 1, max: 20,
+      options: Array.from({ length: 20 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "vez" : "veces"}` })),
       condition: { field: "amenorrhea90", equal: "yes" },
       help: "Número aproximado de episodios de amenorrea prolongada antes de los 40 años."
     },
