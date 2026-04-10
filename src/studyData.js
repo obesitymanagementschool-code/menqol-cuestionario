@@ -34,31 +34,25 @@ export const SECTION_BASICS = {
     },
     {
       id: "age",
-      type: "wheel",
+      type: "select",
       label: "Edad (años)",
-      min: 40, max: 70, step: 1,
-      defaultValue: 52,
-      unit: "años",
+      options: Array.from({ length: 31 }, (_, i) => ({ value: String(i + 40), label: `${i + 40} años` })),
       required: true,
       help: "Tu edad actual en años cumplidos. Este estudio está dirigido a mujeres de 40 a 70 años."
     },
     {
       id: "weight",
-      type: "wheel",
+      type: "select",
       label: "Peso (kg)",
-      min: 30, max: 300, step: 1,
-      defaultValue: 65,
-      unit: "kg",
+      options: Array.from({ length: 271 }, (_, i) => ({ value: String(i + 30), label: `${i + 30} kg` })),
       required: false,
       help: "Tu peso actual aproximado en kilogramos."
     },
     {
       id: "height",
-      type: "wheel",
+      type: "select",
       label: "Talla (cm)",
-      min: 50, max: 250, step: 1,
-      defaultValue: 162,
-      unit: "cm",
+      options: Array.from({ length: 171 }, (_, i) => ({ value: String(i + 80), label: `${i + 80} cm` })),
       required: false,
       help: "Tu estatura en centímetros."
     }
