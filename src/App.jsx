@@ -944,7 +944,17 @@ export default function App() {
   const age = studyData.basics?.age ?? ""
   const weight = studyData.basics?.weight ?? ""
 
-  const scrollTop = () => topRef.current?.scrollIntoView({ behavior: "smooth" })
+  const scrollTop = () => {
+    // iOS Safari requires both window and document.documentElement
+    try {
+      window.scrollTo(0, 0)
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+      const root = document.getElementById("root")
+      if (root) root.scrollTop = 0
+      if (topRef.current) topRef.current.scrollIntoView()
+    } catch(e) {}
+  }
 
   const reset = () => {
     setStep("intro"); setCurrentSection(0)
@@ -1093,7 +1103,11 @@ export default function App() {
           <InfoSheetScreen onAccept={(ts) => {
             setTimestamps(prev => ({ ...prev, infoSheet: ts }))
             setStep("consent")
-            scrollTop()
+            setTimeout(() => {
+              const root = document.getElementById("root")
+              if (root) root.scrollTo({ top: 0, behavior: "smooth" })
+              else window.scrollTo({ top: 0, behavior: "smooth" })
+            }, 50)
           }} />
         )}
 
@@ -1103,7 +1117,11 @@ export default function App() {
             setTimestamps(prev => ({ ...prev, consent: ts, emailConsent }))
             setStep("sections")
             setCurrentSection(0)
-            scrollTop()
+            setTimeout(() => {
+              const root = document.getElementById("root")
+              if (root) root.scrollTo({ top: 0, behavior: "smooth" })
+              else window.scrollTo({ top: 0, behavior: "smooth" })
+            }, 50)
           }} />
         )}
 
