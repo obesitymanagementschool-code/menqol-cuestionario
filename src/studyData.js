@@ -30,7 +30,7 @@ export const SECTION_BASICS = {
       label: "Email",
       placeholder: "tucorreo@ejemplo.com",
       required: true,
-      help: "Tu dirección de correo electrónico. Se usará para enviarte el informe individualizado."
+      help: "Tu dirección de correo electrónico."
     },
     {
       id: "age",
@@ -43,20 +43,17 @@ export const SECTION_BASICS = {
     },
     {
       id: "weight",
-      type: "number",
+      type: "select",
       label: "Peso (kg)",
-      placeholder: "Ej: 65",
-      min: 30, max: 200,
-      step: 0.1,
+      options: Array.from({ length: 271 }, (_, i) => ({ value: String(i + 30), label: `${i + 30} kg` })),
       required: false,
       help: "Tu peso actual aproximado en kilogramos."
     },
     {
       id: "height",
-      type: "number",
+      type: "select",
       label: "Talla (cm)",
-      placeholder: "Ej: 165",
-      min: 120, max: 210,
+      options: Array.from({ length: 201 }, (_, i) => ({ value: String(i + 50), label: `${i + 50} cm` })),
       required: false,
       help: "Tu estatura en centímetros."
     }
@@ -147,12 +144,16 @@ export const SECTION_HABITS = {
     },
     {
       id: "smokingAmount",
-      type: "number",
-      label: "¿Cuántos cigarrillos fumas al día?",
-      placeholder: "Número de cigarrillos",
-      min: 1, max: 100,
+      type: "select",
+      label: "Indique cuántos cigarrillos al día",
+      options: [
+        { value: "1-5", label: "1-5 cigarrillos/día" },
+        { value: "6-10", label: "6-10 cigarrillos/día" },
+        { value: "11-20", label: "11-20 cigarrillos/día" },
+        { value: "21+", label: "Más de 20 cigarrillos/día" }
+      ],
       condition: { field: "smoking", equal: "current" },
-      help: "Número aproximado de cigarrillos que fumas al día."
+      help: "Número aproximado de cigarrillos al día."
     },
     {
       id: "alcoholFreq",
@@ -394,22 +395,13 @@ export const SECTION_GYNECOLOGY = {
   questions: [
     {
       id: "menarche",
-      type: "radio",
+      type: "select",
       label: "¿A qué edad tuvo su primera menstruación (menarquia)?",
       options: [
-        { value: "8", label: "8 años" },
-        { value: "9", label: "9 años" },
-        { value: "10", label: "10 años" },
-        { value: "11", label: "11 años" },
-        { value: "12", label: "12 años" },
-        { value: "13", label: "13 años" },
-        { value: "14", label: "14 años" },
-        { value: "15", label: "15 años" },
-        { value: "16", label: "16 años" },
-        { value: "17+", label: "17 años o más" },
+        ...Array.from({ length: 13 }, (_, i) => ({ value: String(i + 8), label: `${i + 8} años` })),
         { value: "unknown", label: "No lo recuerdo" }
       ],
-      help: "La edad a la que tuviste tu primera regla."
+      help: "La edad a la que tuvo su primera regla."
     },
     {
       id: "lastPeriod",
@@ -421,31 +413,53 @@ export const SECTION_GYNECOLOGY = {
         { value: "6-12months", label: "Hace 6-12 meses" },
         { value: "1-5years", label: "Hace 1-5 años" },
         { value: "5+years", label: "Hace más de 5 años" },
-        { value: "no_12months", label: "No he tenido la menstruación en los últimos 12 meses o más" },
         { value: "surgical", label: "No tengo reglas por cirugía/tratamiento" },
         { value: "unknown", label: "No lo recuerdo" }
       ],
-      help: "Mes: _______ Año: _______"
+      help: "Seleccione la opción que mejor corresponda."
+    },
+    {
+      id: "lastPeriodMonth",
+      type: "select",
+      label: "Mes de la última menstruación",
+      options: [
+        { value: "1", label: "Enero" }, { value: "2", label: "Febrero" },
+        { value: "3", label: "Marzo" }, { value: "4", label: "Abril" },
+        { value: "5", label: "Mayo" }, { value: "6", label: "Junio" },
+        { value: "7", label: "Julio" }, { value: "8", label: "Agosto" },
+        { value: "9", label: "Septiembre" }, { value: "10", label: "Octubre" },
+        { value: "11", label: "Noviembre" }, { value: "12", label: "Diciembre" }
+      ],
+      condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
+      help: "Mes aproximado de su última menstruación."
+    },
+    {
+      id: "lastPeriodYear",
+      type: "select",
+      label: "Año de la última menstruación",
+      options: Array.from({ length: 10 }, (_, i) => ({ value: String(2025 - i), label: String(2025 - i) })),
+      condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
+      help: "Año aproximado de su última menstruación."
     },
     {
       id: "yearsWithoutPeriod",
       type: "select",
       label: "¿Cuántos años lleva sin la menstruación?",
       options: Array.from({ length: 70 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "año" : "años"}` })),
-      condition: { field: "lastPeriod", equal: "no_12months" },
-      help: "Indique el número de años que lleva sin tener la menstruación."
+      condition: { field: "lastPeriod", oneOf: ["1-5years", "5+years"] },
+      help: "Número de años que lleva sin tener la menstruación."
     },
     {
       id: "irregularCycles",
       type: "radio",
-      label: "En los últimos 12 meses, ¿ha notado una diferencia de 7 días o más en la duración habitual de sus ciclos menstruales?",
+      label: "En los últimos 12 meses, ¿ha notado una diferencia de 7 días o más en la duración habitual de sus ciclos menstruales? (Ejemplo: antes sus ciclos duraban 28 días y ahora duran 21 o menos o 35 días o más).",
       options: [
         { value: "yes", label: "Sí" },
         { value: "no", label: "No" },
         { value: "na", label: "No aplica (no tengo la menstruación)" }
       ],
-      condition: { field: "lastPeriod", notEqual: "surgical" },
-      help: "Por ejemplo: antes sus ciclos duraban 28 días y ahora duran 21 o menos o 35 días o más."
+      condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
+      help: ""
     },
     {
       id: "amenorrhea60",
@@ -456,8 +470,8 @@ export const SECTION_GYNECOLOGY = {
         { value: "no", label: "No" },
         { value: "na", label: "No aplica (no tengo la menstruación)" }
       ],
-      condition: { field: "lastPeriod", notEqual: "surgical" },
-      help: "Ausencias prolongadas del periodo menstrual en el último año."
+      condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
+      help: ""
     },
     {
       id: "amenorrhea90",
@@ -488,27 +502,27 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "pregnancies",
-      type: "number",
-      label: "¿Cuántas veces ha estado embarazada a lo largo de su vida? (Incluya todos los embarazos, independientemente de su resultado)",
-      placeholder: "0",
-      min: 0, max: 20,
+      type: "select",
+      label: "¿Cuántas veces ha estado embarazada a lo largo de su vida? (Incluya todos los embarazos, independientemente de su resultado). (Si es 0, indique 0)",
+      options: Array.from({ length: 21 }, (_, i) => ({ value: String(i), label: i === 0 ? "0 embarazos" : `${i} ${i === 1 ? "embarazo" : "embarazos"}` })),
       help: "Total de embarazos, incluyendo los que no llegaron a término."
     },
     {
       id: "deliveries",
-      type: "number",
+      type: "select",
       label: "¿Cuántos partos ha tenido?",
-      placeholder: "0",
-      min: 0, max: 15,
+      options: Array.from({ length: 16 }, (_, i) => ({ value: String(i), label: i === 0 ? "0 partos" : `${i} ${i === 1 ? "parto" : "partos"}` })),
       help: "Número de partos a término (vaginales o cesáreas)."
     },
     {
       id: "breastfeedingMonths",
-      type: "number",
-      label: "Sumando todos sus hijos, ¿cuántos meses en total ha dado lactancia materna a lo largo de su vida?",
-      placeholder: "0",
-      min: 0, max: 120,
-      help: "Total de meses de lactancia materna acumulando todos los hijos. Indica 0 si no has dado lactancia."
+      type: "select",
+      label: "Sumando todos sus hijos, ¿cuántos meses en total (aproximadamente) ha dado lactancia materna a lo largo de su vida?",
+      options: [
+        { value: "0", label: "0 meses (no he dado lactancia)" },
+        ...Array.from({ length: 120 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "mes" : "meses"}` }))
+      ],
+      help: "Total de meses de lactancia materna acumulando todos los hijos."
     },
     {
       id: "hysterectomy",
@@ -518,10 +532,9 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "hysterectomyAge",
-      type: "number",
+      type: "select",
       label: "¿A qué edad le realizaron la histerectomía?",
-      placeholder: "Edad en años",
-      min: 18, max: 80,
+      options: Array.from({ length: 63 }, (_, i) => ({ value: String(i + 18), label: `${i + 18} años` })),
       condition: { field: "hysterectomy", equal: true },
       help: "Tu edad cuando te extirparon el útero."
     },
@@ -538,10 +551,9 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "oophorectomyAge",
-      type: "number",
+      type: "select",
       label: "¿A qué edad le realizaron la ooforectomía?",
-      placeholder: "Edad en años",
-      min: 18, max: 80,
+      options: Array.from({ length: 63 }, (_, i) => ({ value: String(i + 18), label: `${i + 18} años` })),
       condition: { field: "oophorectomy", notEqual: "no" },
       help: "Tu edad cuando te extirparon el/los ovario(s)."
     },
@@ -563,10 +575,9 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "contraceptivesYears",
-      type: "number",
+      type: "select",
       label: "¿Durante cuántos años en total, sumando todos los periodos?",
-      placeholder: "Número de años",
-      min: 0, max: 50,
+      options: Array.from({ length: 50 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "año" : "años"}` })),
       condition: { field: "contraceptives", equal: "past" },
       help: "Suma todos los períodos de uso de anticonceptivos hormonales."
     },
@@ -597,10 +608,9 @@ export const SECTION_GYNECOLOGY = {
     },
     {
       id: "thmDuration",
-      type: "number",
+      type: "select",
       label: "¿Cuántos años la ha utilizado en total? (Si es menor a un año responda 1)",
-      placeholder: "Número de años",
-      min: 1, max: 30,
+      options: Array.from({ length: 30 }, (_, i) => ({ value: String(i + 1), label: `${i + 1} ${i + 1 === 1 ? "año" : "años"}` })),
       condition: { field: "thm", notEqual: "never" },
       help: "Duración total del tratamiento hormonal de la menopausia sumando todos los periodos."
     },
@@ -740,8 +750,9 @@ export const SECTION_QUICK_HEALTH = {
 // Helper to check if a question's condition is met
 export function isConditionMet(question, sectionAnswers) {
   if (!question.condition) return true;
-  const { field, notEqual, equal } = question.condition;
+  const { field, notEqual, equal, oneOf } = question.condition;
   const value = sectionAnswers[field];
+  if (oneOf !== undefined) return oneOf.includes(value);
   if (notEqual !== undefined) return value !== notEqual;
   if (equal !== undefined) return value === equal;
   return true;
