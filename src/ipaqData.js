@@ -213,16 +213,11 @@ const MINUTES_OPTIONS = [
 
 const SITTING_OPTIONS = [
   { value: "0", label: "0 minutos" },
-  ...Array.from({ length: 11 }, (_, i) => ({ value: String((i + 1) * 30), label: `${(i + 1) * 30} minutos` })),
-  { value: "360", label: "360 minutos (6 horas)" },
-  { value: "420", label: "420 minutos (7 horas)" },
-  { value: "480", label: "480 minutos (8 horas)" },
-  { value: "540", label: "540 minutos (9 horas)" },
-  { value: "600", label: "600 minutos (10 horas)" },
-  { value: "660", label: "660 minutos (11 horas)" },
-  { value: "720", label: "720 minutos (12 horas)" },
-  { value: "840", label: "840 minutos (14 horas)" },
-  { value: "960", label: "960 minutos (16 horas)" }
+  ...Array.from({ length: 192 }, (_, i) => {
+    const mins = (i + 1) * 5
+    if (mins % 60 === 0) return { value: String(mins), label: `${mins} minutos (${mins/60}h)` }
+    return { value: String(mins), label: `${mins} minutos` }
+  })
 ]
 
 export const IPAQ_SHORT = {
@@ -324,7 +319,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física vigorosa relacionada con el trabajo → pase a la pregunta de actividad moderada."
         },
         {
-          id: "ipaq_l_workVigMinutes",
+          id: "ipaq_l_workVigMin",
           type: "select",
           label: "¿Cuánto tiempo en total usualmente le toma realizar actividades físicas vigorosas en uno de esos días como parte de su trabajo?",
           sublabel: "Minutos por día",
@@ -341,7 +336,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física moderada relacionada con el trabajo → pase a la pregunta de caminar."
         },
         {
-          id: "ipaq_l_workModMinutes",
+          id: "ipaq_l_workModMin",
           type: "select",
           label: "¿Cuánto tiempo en total usualmente le toma realizar actividades físicas moderadas en uno de esos días como parte de su trabajo?",
           sublabel: "Minutos por día",
@@ -358,7 +353,7 @@ export const IPAQ_LONG = {
           help: "Ninguna caminata relacionada con trabajo → pase a la Parte 2."
         },
         {
-          id: "ipaq_l_workWalkMinutes",
+          id: "ipaq_l_workWalkMin",
           type: "select",
           label: "¿Cuánto tiempo en total pasó generalmente caminando en uno de esos días como parte de su trabajo?",
           sublabel: "Minutos por día",
@@ -381,7 +376,7 @@ export const IPAQ_LONG = {
           help: "No montó en bicicleta de un sitio a otro → pase a la siguiente pregunta."
         },
         {
-          id: "ipaq_l_transBikeMinutes",
+          id: "ipaq_l_transBikeMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo gastó usted en uno de esos días montando en bicicleta de un lugar a otro?",
           sublabel: "Minutos por día",
@@ -397,7 +392,7 @@ export const IPAQ_LONG = {
           help: "Ninguna caminata de un sitio a otro → pase a la Parte 3."
         },
         {
-          id: "ipaq_l_transWalkMinutes",
+          id: "ipaq_l_transWalkMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo gastó usted en uno de esos días caminando de un sitio a otro?",
           sublabel: "Minutos por día",
@@ -420,7 +415,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física vigorosa en el jardín o patio → pase a la siguiente pregunta."
         },
         {
-          id: "ipaq_l_homeVigMinutes",
+          id: "ipaq_l_homeVigMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo dedica usted en uno de esos días haciendo actividades físicas vigorosas en el jardín o patio?",
           sublabel: "Minutos por día",
@@ -436,7 +431,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física moderada en el jardín o patio → pase a la siguiente pregunta."
         },
         {
-          id: "ipaq_l_homeModOutMinutes",
+          id: "ipaq_l_homeModOutMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo dedica usted en uno de esos días haciendo actividades físicas moderadas en el jardín o patio?",
           sublabel: "Minutos por día",
@@ -452,7 +447,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física moderada dentro de la casa → pase a la Parte 4."
         },
         {
-          id: "ipaq_l_homeModInMinutes",
+          id: "ipaq_l_homeModInMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo dedica usted en uno de esos días haciendo actividades físicas moderadas dentro de su casa?",
           sublabel: "Minutos por día",
@@ -475,7 +470,7 @@ export const IPAQ_LONG = {
           help: "Ninguna caminata en tiempo libre → pase a la siguiente pregunta."
         },
         {
-          id: "ipaq_l_leisWalkMinutes",
+          id: "ipaq_l_leisWalkMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo gastó usted en uno de esos días caminando en su tiempo libre?",
           sublabel: "Minutos por día",
@@ -491,7 +486,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física vigorosa en tiempo libre → pase a la siguiente pregunta."
         },
         {
-          id: "ipaq_l_leisVigMinutes",
+          id: "ipaq_l_leisVigMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo dedica usted en uno de esos días haciendo actividades físicas vigorosas en su tiempo libre?",
           sublabel: "Minutos por día",
@@ -507,7 +502,7 @@ export const IPAQ_LONG = {
           help: "Ninguna actividad física moderada en tiempo libre → pase a la Parte 5."
         },
         {
-          id: "ipaq_l_leisModMinutes",
+          id: "ipaq_l_leisModMin",
           type: "select",
           label: "Usualmente, ¿cuánto tiempo dedica usted en uno de esos días haciendo actividades físicas moderadas en su tiempo libre?",
           sublabel: "Minutos por día",
@@ -526,7 +521,6 @@ export const IPAQ_LONG = {
           id: "ipaq_l_sitWeekday",
           type: "select",
           label: "Durante los últimos 7 días, ¿cuánto tiempo permaneció sentada en un día entre semana (de lunes a viernes)?",
-          sublabel: "Minutos por día",
           options: SITTING_OPTIONS,
           help: "No incluya el tiempo que permanece sentada en un vehículo de motor que ya haya mencionado anteriormente."
         },
@@ -534,7 +528,6 @@ export const IPAQ_LONG = {
           id: "ipaq_l_sitWeekend",
           type: "select",
           label: "Durante los últimos 7 días, ¿cuánto tiempo permaneció sentada en un día del fin de semana (sábado o domingo)?",
-          sublabel: "Minutos por día",
           options: SITTING_OPTIONS,
           help: "No incluya el tiempo que permanece sentada en un vehículo de motor."
         }
