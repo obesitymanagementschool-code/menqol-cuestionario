@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { DOMAINS } from './data.js'
 // La conexión a Supabase se hace server-side en la Edge Function
 // El frontend solo llama a la función — nunca escribe directamente en la BD
-const EDGE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL
-  ?? 'https://TU_PROJECT_ID.supabase.co/functions/v1/submit-response'
+
 import {
   SECTION_BASICS, SECTION_DEMOGRAPHICS, SECTION_HABITS,
   SECTION_HEALTH, SECTION_GYNECOLOGY,
@@ -18,6 +17,8 @@ import Dashboard from './Dashboard.jsx'
 import AboutPage from './AboutPage.jsx'
 import PrivacyPolicy from './PrivacyPolicy.jsx'
 import './styles.css'
+import { supabase } from './supabase.js'
+import { submitToSupabase } from './submitData.js'
 
 /* ─── Helpers ─── */
 const getLevel = (pct) => {
@@ -45,11 +46,7 @@ const getAgeGroup = (age) => {
 
 const menqolToPct = (v) => (v - 1) / 7 * 100
 
-/* ─── Generate MDH-XXXXXX project code ─── */
-const generateProjectCode = () => {
-  const num = Math.floor(Math.random() * 1000000).toString().padStart(6, '0')
-  return `MDH-${num}`
-}
+
 
 /* ─── Timestamp with full precision ─── */
 const nowTimestamp = () => new Date().toISOString()
@@ -589,6 +586,7 @@ function RadarChart({ domainResults, refPcts, ageGroup }) {
 /* ─── Results View ─── */
 function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPrivacy, timestamps, projectCode }) {
   const [saveStatus, setSaveStatus] = useState(null)
+  const [savedCode, setSavedCode] = useState(null)
   const hasSaved = useRef(false)
 
   const domainResults = DOMAINS.map(domain => {
@@ -627,39 +625,19 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
   const handleSave = async () => {
     setSaveStatus("saving")
     try {
-      const scores = {
-        vasomotor:    domainResults[0]?.mean ?? null,
-        psychosocial: domainResults[1]?.mean ?? null,
-        physical:     domainResults[2]?.mean ?? null,
-        sexual:       domainResults[3]?.mean ?? null,
-      }
-
-      const url = EDGE_FUNCTION_URL
-      if (!url || url.includes('TU_PROJECT_ID')) {
-        console.error("VITE_SUPABASE_FUNCTION_URL no configurada")
-        setSaveStatus("error")
-        return
-      }
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectCode,
-          timestamps,
-          studyData,
-          menqolAnswers,
-          scores,
-          overallMean,
-        }),
+      const ipaqAnswers = studyData.ipaqLong || {}
+      const code = await submitToSupabase({
+        studyData,
+        menqolAnswers,
+        ipaqAnswers,
+        reproStage,
+        timestamps,
       })
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}))
-        throw new Error(err.error || `HTTP ${response.status}`)
-      }
-
+      // El project_code lo genera Supabase (MDH-000001, 000002...)
+      // Lo mostramos en pantalla actualizando el estado del padre
+      if (typeof setProjectCodeExternal === 'function') setProjectCodeExternal(code)
       setSaveStatus("saved")
+      setSavedCode(code)
     } catch (e) {
       console.error("Save error:", e)
       setSaveStatus("error")
@@ -683,7 +661,9 @@ function ResultsView({ menqolAnswers, studyData, age, weight, onReset, onOpenPri
         display: "flex", alignItems: "center", justifyContent: "space-between"
       }}>
         <span style={{ fontSize: 12, color: "#94A3B8" }}>Código de participante</span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: "#1E293B", letterSpacing: "0.05em" }}>{projectCode}</span>
+        <span style={{ fontSize: 14, fontWeight: 800, color: "#1E293B", letterSpacing: "0.05em" }}>
+    {savedCode || projectCode || "Generando..."}
+  </span>
       </div>
 
       {/* Overall score */}
@@ -934,7 +914,7 @@ export default function App() {
   const [studyData, setStudyData] = useState({})
   const [openTooltip, setOpenTooltip] = useState(null)
   const [openHelp, setOpenHelp] = useState(null)
-  const [projectCode] = useState(() => generateProjectCode())
+  const [projectCode, setProjectCode] = useState(null)
   const [timestamps, setTimestamps] = useState({ infoSheet: null, consent: null })
   const topRef = useRef(null)
 
@@ -1152,15 +1132,16 @@ export default function App() {
               />
             ) : section.id === "results" ? (
               <ResultsView
-                menqolAnswers={menqolAnswers}
-                studyData={studyData}
-                age={age}
-                weight={weight}
-                onReset={reset}
-                onOpenPrivacy={() => setStep("privacy")}
-                timestamps={timestamps}
-                projectCode={projectCode}
-              />
+    menqolAnswers={menqolAnswers}
+    studyData={studyData}
+    age={age}
+    weight={weight}
+    onReset={reset}
+    onOpenPrivacy={() => setStep("privacy")}
+    timestamps={timestamps}
+    projectCode={projectCode}
+    setProjectCodeExternal={setProjectCode}
+  />
             ) : (
               <GenericSectionView
                 section={section}
