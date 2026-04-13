@@ -429,7 +429,7 @@ export const SECTION_GYNECOLOGY = {
       id: "lastPeriodYear",
       type: "select",
       label: "Año de la última menstruación",
-      options: Array.from({ length: 10 }, (_, i) => ({ value: String(2025 - i), label: String(2025 - i) })),
+      options: Array.from({ length: 11 }, (_, i) => ({ value: String(2026 - i), label: String(2026 - i) })),
       condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
       help: "Año aproximado de su última menstruación."
     },
@@ -447,8 +447,7 @@ export const SECTION_GYNECOLOGY = {
       label: "En los últimos 12 meses, ¿ha notado una diferencia de 7 días o más en la duración habitual de sus ciclos menstruales? (Ejemplo: antes sus ciclos duraban 28 días y ahora duran 21 o menos o 35 días o más).",
       options: [
         { value: "yes", label: "Sí" },
-        { value: "no", label: "No" },
-        { value: "na", label: "No aplica (no tengo la menstruación)" }
+        { value: "no", label: "No" }
       ],
       condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
       help: ""
@@ -459,8 +458,7 @@ export const SECTION_GYNECOLOGY = {
       label: "En los últimos 12 meses, ¿ha tenido faltas o ausencias de menstruación que hayan durado 60 días (2 meses) o más?",
       options: [
         { value: "yes", label: "Sí" },
-        { value: "no", label: "No" },
-        { value: "na", label: "No aplica (no tengo la menstruación)" }
+        { value: "no", label: "No" }
       ],
       condition: { field: "lastPeriod", oneOf: ["current", "3-6months", "6-12months"] },
       help: ""
