@@ -378,12 +378,18 @@ export function buildSharedPayload(studyData, menqolAnswers, ipaqAnswers, reproS
 export async function submitToSupabase({ studyData, menqolAnswers, ipaqAnswers, reproStage, timestamps }) {
   // 1. Construir payload compartido
   const shared = buildSharedPayload(studyData, menqolAnswers, ipaqAnswers, reproStage)
-
   const basics = studyData.basics || {}
 
-  // 2. Payload responses_raw (incluye datos personales + timestamps)
+  // 2. Obtener el siguiente project_code correlativo desde Supabase
+  // La función generate_mdh_code() consume la secuencia y devuelve MDH-000001 etc.
+  const { data: codeData, error: codeError } = await supabase.rpc('generate_mdh_code')
+  if (codeError) throw new Error('Error generando código: ' + codeError.message)
+  const projectCode = codeData
+
+  // 3. Payload responses_raw (datos personales + timestamps + código)
   const rawPayload = {
     ...shared,
+    project_code:  projectCode,
     nombre:        basics.nombre    || null,
     apellido:      basics.apellido  || null,
     email:         basics.email     || null,
@@ -392,35 +398,28 @@ export async function submitToSupabase({ studyData, menqolAnswers, ipaqAnswers, 
     email_consent: timestamps.emailConsent ?? false,
   }
 
-  // 3. Insertar en responses_raw → Supabase genera project_code correlativo
-  const { data: rawData, error: rawError } = await supabase
+  // 4. Insertar en responses_raw (solo INSERT, no necesita SELECT)
+  const { error: rawError } = await supabase
     .from('responses_raw')
     .insert(rawPayload)
-    .select('project_code')
-    .single()
 
   if (rawError) throw new Error('Error al guardar datos: ' + rawError.message)
 
-  const projectCode = rawData.project_code
-
-  // 4. Insertar en responses_anonymous con el mismo project_code
+  // 5. Insertar en responses_anonymous con el mismo project_code
   const { error: anonError } = await supabase
     .from('responses_anonymous')
     .insert({ ...shared, project_code: projectCode })
 
   if (anonError) {
-    // No bloqueamos si falla anonymous (los datos raw ya están guardados)
-    console.warn('Error al guardar datos anónimos:', anonError.message)
+    console.warn('Error al guardar datos anonimos:', anonError.message)
   }
 
-  // 5. Calcular FRAX orientativo y actualizar ambas tablas
+  // 6. Calcular FRAX orientativo y actualizar ambas tablas
   try {
-    const h = health => health
-    const healthData = studyData.health || {}
     const alcoUnitsNum = shared.alcohol_units_num
     const alcoFreqNum  = shared.alcohol_freq_num
 
-    const { data: fraxData } = await supabase.rpc('calcular_frax_orientativo', {
+    const { data: fraxResult } = await supabase.rpc('calcular_frax_orientativo', {
       p_age:        shared.age,
       p_prior_fx:   shared.fractures_num === 1,
       p_parent_hip: shared.parent_hip_fracture_num === 1,
@@ -431,21 +430,20 @@ export async function submitToSupabase({ studyData, menqolAnswers, ipaqAnswers, 
       p_alcohol:    fraxAlcohol(alcoUnitsNum, alcoFreqNum),
     })
 
-    if (fraxData) {
+    if (fraxResult) {
       const fraxUpdate = {
-        frax_rf_count:       fraxData.frax_rf_count,
-        frax_rf_detail:      fraxData.frax_rf_detail,
-        frax_alcohol_flag:   fraxData.frax_alcohol_flag,
-        frax_ref_hip_low:    fraxData.frax_ref_hip_low,
-        frax_ref_hip_high:   fraxData.frax_ref_hip_high,
-        frax_ref_major_low:  fraxData.frax_ref_major_low,
-        frax_ref_major_high: fraxData.frax_ref_major_high,
-        frax_ref_risk_text:  fraxData.frax_ref_risk_text,
-        frax_ref_risk_num:   fraxData.frax_ref_risk_num,
-        frax_risk_text:      fraxData.frax_risk_text,
-        frax_risk_num:       fraxData.frax_risk_num,
+        frax_rf_count:       fraxResult.frax_rf_count,
+        frax_rf_detail:      fraxResult.frax_rf_detail,
+        frax_alcohol_flag:   fraxResult.frax_alcohol_flag,
+        frax_ref_hip_low:    fraxResult.frax_ref_hip_low,
+        frax_ref_hip_high:   fraxResult.frax_ref_hip_high,
+        frax_ref_major_low:  fraxResult.frax_ref_major_low,
+        frax_ref_major_high: fraxResult.frax_ref_major_high,
+        frax_ref_risk_text:  fraxResult.frax_ref_risk_text,
+        frax_ref_risk_num:   fraxResult.frax_ref_risk_num,
+        frax_risk_text:      fraxResult.frax_risk_text,
+        frax_risk_num:       fraxResult.frax_risk_num,
       }
-
       await supabase.from('responses_raw').update(fraxUpdate).eq('project_code', projectCode)
       await supabase.from('responses_anonymous').update(fraxUpdate).eq('project_code', projectCode)
     }
